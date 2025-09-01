@@ -4,87 +4,38 @@ import BBAutocomplete, { BBSearchable } from "./ui/BBAutocomplete.tsx";
 import { useState } from "react";
 import { v7 as uuidv7 } from "uuid";
 
-interface BasketItem extends BBSearchable {
-  id: string;
-  name: string;
-  price?: number;
-  store?: string;
-}
-interface ItemStore extends BBSearchable {
-  id: string;
-  name: string;
-}
+///TODELETE
+import dummyDataAPI, {
+  BasketItem,
+  Store,
+  Item,
+  StoreItemDB,
+  StoreItem,
+} from "./utils/data.ts";
+let { getStoreItems, getStores } = dummyDataAPI();
+///TODELETE
 
-interface AnyStore extends ItemStore {
-  id: "0";
-  name: "any";
-}
-
-const ANYSTORE: AnyStore = {
-  id: "0",
-  name: "any",
-};
-
-let ItemStoreList: [AnyStore, ...ItemStore[]] = [
-  { ...ANYSTORE },
-  {
-    id: "1",
-    name: "SM Aura",
-  },
-  {
-    id: "2",
-    name: "Market Market",
-  },
-  {
-    id: "3",
-    name: "Rob - Stamford",
-  },
-  {
-    id: "4",
-    name: "Marketplace - Venice",
-  },
-];
-
-let ItemsList: BasketItem[] = [
-  {
-    id: "1",
-    name: "milk",
-    price: 100.0,
-    store: "SM",
-  },
-  {
-    id: "2",
-    name: "Skimmed Milk",
-    price: 150.0,
-    store: "SM",
-  },
-  {
-    id: "3",
-    name: "Fish",
-    price: 500.0,
-    store: "Market",
-  },
-  {
-    id: "4",
-    name: "Oats",
-    price: 400.0,
-    store: "Market",
-  },
-  {
-    id: "5",
-    name: "Cheese",
-    price: 20.0,
-    store: "SM",
-  },
-];
+let ItemStoreList = getStores(); // figure out how to limit what to fetch initial
+let ItemsList = getStoreItems(); // too much load if all is fetched
 
 function App() {
-  let [storeList, setStoreList] = useState<Array<ItemStore>>(ItemStoreList);
-  let [shelfItems, setShelfItems] = useState<Array<BasketItem>>(ItemsList);
-  let [selectedStore, setSelectedStore] = useState<ItemStore>(); // maybe make it possible to allow select of multiple stores in the future
+  let [storeList, setStoreList] = useState<Array<Store>>(ItemStoreList);
+  let [shelfItems, setShelfItems] = useState<Array<StoreItem>>(ItemsList); //initial fetch how to limit, fetch only if a store is selected? maybe add "all"(only UI option and disables filter) and "no store selected"(treated as actual store value in DB) options, could default to "no store selected"
+  let [selectedStore, setSelectedStore] = useState<Store>(); //future: multiple store select
+  let [selectedItem, setSelectedItem] = useState<StoreItem>();
+  let [filteredItems, setFilteredItems] = useState<Array<StoreItem>>(ItemsList);
 
-  function handleStoreSelect(store?: ItemStore) {
+  function handleStoreSelect(store?: Store) {
     setSelectedStore(store);
+    if (store) {
+      //REFACTOR
+      let newfilteredItems = shelfItems.filter(
+        (item) => item.storeId === store.id
+      );
+      setFilteredItems(newfilteredItems);
+    } else {
+      setFilteredItems(shelfItems);
+    }
   }
 
   function handleCreateNewStore(name: string) {
@@ -95,30 +46,41 @@ function App() {
   }
 
   function handleItemSelect(item?: BasketItem) {
-    //update store list as well to only display stores that has the selected item(????) maybe not for now yet, JUST DISPLAY ALL for now
-    return;
+    //future: filter storelist to only stores with item available
+    setSelectedItem(item);
   }
 
   function handleCreateNewItem(name: string) {
     let newID = uuidv7();
-    let newItem = { id: newID, name: name };
+    let storeName = selectedStore?.name ?? undefined;
+    let storeId = selectedStore?.id ?? "";
+    let newItem = {
+      id: newID + storeId,
+      itemId: newID,
+      name: name,
+      storeId: storeId,
+      storeName: storeName,
+    };
     setShelfItems([...shelfItems, newItem]);
     return newItem;
   }
 
   return (
     <>
-      <h1>{selectedStore?.name}</h1>
-      <BBAutocomplete<ItemStore>
+      <BBAutocomplete<Store>
         suggestionsDataSource={storeList}
         selected={selectedStore}
         onSelect={handleStoreSelect}
         onCreateNew={handleCreateNewStore}
+        placeHolder="Search Store"
       />
       <BBAutocomplete<BasketItem>
-        suggestionsDataSource={shelfItems}
+        suggestionsDataSource={filteredItems}
+        selected={selectedItem}
         onSelect={handleItemSelect}
         onCreateNew={handleCreateNewItem}
+        showCreateOptionAlways={selectedStore === undefined}
+        placeHolder="Search Item"
       />
       <PWABadge />
     </>

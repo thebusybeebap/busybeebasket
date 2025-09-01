@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 
 export interface BBSearchable {
-  // this components needs the data object type to have a name property of type string to work as intended
   name: string;
 }
 
@@ -10,11 +9,15 @@ function BBAutocomplete<T extends BBSearchable>({
   selected,
   onSelect,
   onCreateNew,
+  showCreateOptionAlways,
+  placeHolder,
 }: {
   suggestionsDataSource: Array<T>;
   selected?: T;
   onSelect?: (selected?: T) => void;
   onCreateNew?: (name: string) => T;
+  showCreateOptionAlways?: boolean;
+  placeHolder?: string;
 }) {
   let [searchValue, setSearchValue] = useState(selected?.name ?? "");
   let [suggestions, setSuggestions] = useState<Array<T>>([]);
@@ -33,7 +36,7 @@ function BBAutocomplete<T extends BBSearchable>({
       return cleanedItemName.match(cleanedValue);
     });
 
-    setHideNewOption(hasExactMatch);
+    setHideNewOption(showCreateOptionAlways || hasExactMatch);
 
     return filteredSuggestions;
   }
@@ -110,6 +113,7 @@ function BBAutocomplete<T extends BBSearchable>({
           ref={searchInputRef}
           className="border"
           type="text"
+          placeholder={placeHolder}
           value={searchValue}
           onChange={handleSearchChange}
           onBlur={resetNoSelected}
