@@ -12,7 +12,7 @@ function BBAutocomplete<T extends BBSearchable>({
   showCreateOptionAlways,
   placeHolder,
 }: {
-  suggestionsDataSource: Array<T>;
+  suggestionsDataSource: Array<T>; //TODO: should be changed into a fetch/query data function, fetch/query from onlineDB/cache/local, realtime data manipulation should be enabled
   selected?: T;
   onSelect?: (selected?: T) => void;
   onCreateNew?: (name: string) => T;

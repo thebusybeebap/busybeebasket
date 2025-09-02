@@ -1,6 +1,7 @@
 import BBAutocomplete from "../ui/BBAutocomplete";
 import BBList from "../ui/BBList";
 
+//Main component? has search and list
 function BBBasket() {
   return (
     <div>

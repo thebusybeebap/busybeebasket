@@ -1,6 +1,6 @@
 import PWABadge from "./PWABadge.tsx";
 import "./App.css";
-import BBAutocomplete, { BBSearchable } from "./ui/BBAutocomplete.tsx";
+import BBAutocomplete from "./ui/BBAutocomplete.tsx";
 import { useState } from "react";
 import { v7 as uuidv7 } from "uuid";
 
@@ -15,12 +15,12 @@ import dummyDataAPI, {
 let { getStoreItems, getStores } = dummyDataAPI();
 ///TODELETE
 
-let ItemStoreList = getStores(); // figure out how to limit what to fetch initial
+let ItemStoreList = getStores(); // figure out how to limit what to fetch initial //10-15 google search as basis
 let ItemsList = getStoreItems(); // too much load if all is fetched
 
 function App() {
   let [storeList, setStoreList] = useState<Array<Store>>(ItemStoreList);
-  let [shelfItems, setShelfItems] = useState<Array<StoreItem>>(ItemsList); //initial fetch how to limit, fetch only if a store is selected? maybe add "all"(only UI option and disables filter) and "no store selected"(treated as actual store value in DB) options, could default to "no store selected"
+  let [shelfItems, setShelfItems] = useState<Array<StoreItem>>(ItemsList); //DB mock //initial fetch how to limit, fetch only if a store is selected? maybe add "all"(only UI option and disables filter) and "no store selected"(treated as actual store value in DB) options, could default to "no store selected"
   let [selectedStore, setSelectedStore] = useState<Store>(); //future: multiple store select
   let [selectedItem, setSelectedItem] = useState<StoreItem>();
   let [filteredItems, setFilteredItems] = useState<Array<StoreItem>>(ItemsList);
