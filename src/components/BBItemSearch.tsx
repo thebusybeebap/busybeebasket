@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BBAutocomplete from "../ui/BBAutocomplete";
+import BBAutocomplete, { BBSearchable } from "../ui/BBAutocomplete";
 import dummyDataAPI, { Store, StoreItem } from "../utils/data";
 import { generateNewItemId, generateNewStoreId } from "../utils/idGenerator";
 
@@ -18,18 +18,24 @@ function BBItemSearch() {
 
   //ITEMS STATE
   let [shelfItems, setShelfItems] = useState(itemsDBdummy);
-  //filteredItems; // is this really needed? maybe just filter on the go
   let [selectedItem, setSelectedItem] = useState<StoreItem>();
-  let filteredItems = shelfItems; //does this need to be state?
+
+  //DUMMY DELETE
+  function fakeStoreFetchFromDB() {
+    //DEBOUNCE Tquery 300ms //cachefirst if possible, disable query initially
+    return storeList;
+  }
+  //DUMMY DELETE
+  function fakeItemFetchFromDB() {
+    return shelfItems;
+  }
 
   //STORES SEARCH SELECT
   function handleStoreSelect(store?: Store) {
     if (store) {
       setSelectedStore(store);
-      filteredItems = shelfItems.filter((item) => item.storeId === store.id);
     } else {
-      //setSelectedStore(undefined); is this needed check what heppens if search cleared or emptied
-      filteredItems = shelfItems;
+      setSelectedStore(undefined);
     }
   }
 
@@ -43,11 +49,25 @@ function BBItemSearch() {
   }
 
   //STORES SEARCH FILTER
-  function handleStoreSearch(searchValue: string): Store[] {
-    //onSearch to replace _filterSuggestions in BBAutocomplete component
-    //provides more control on how to filter search
+  function _filterStores(
+    searchValue: string,
+    dataFetchFunction: () => Store[]
+  ): Store[] {
+    let cleanedValue = searchValue.trim().toLowerCase();
 
-    return [];
+    let suggestionsDataSource = dataFetchFunction(); //useCallback? //do you really fetch every type?
+
+    // useMemo?
+    let filteredSuggestions = suggestionsDataSource.filter((data) => {
+      let cleanedItemName = data.name.trim().toLowerCase();
+      return cleanedItemName.match(cleanedValue);
+    });
+
+    return filteredSuggestions;
+  }
+
+  function getStoreSuggestions(searchValue: string) {
+    return _filterStores(searchValue, fakeStoreFetchFromDB);
   }
 
   //ITEMS SEARCH SELECT
@@ -56,7 +76,7 @@ function BBItemSearch() {
     if (item) {
       setSelectedItem(item);
     } else {
-      //setSelectedItem(undefined); // TOCHECK like in store
+      setSelectedItem(undefined);
     }
   }
 
@@ -78,8 +98,31 @@ function BBItemSearch() {
   }
 
   //ITEMS SEARCH FILTER
-  function handleItemSearch(searchValue: string): Store[] {
-    return [];
+  function _filterItems(
+    searchValue: string,
+    dataFetchFunction: () => StoreItem[]
+  ): StoreItem[] {
+    let cleanedValue = searchValue.trim().toLowerCase();
+
+    let suggestionsDataSource = dataFetchFunction(); //useCallback? //do you really fetch every type?
+
+    // useMemo?
+    let filteredSuggestions = suggestionsDataSource.filter((data) => {
+      let cleanedItemName = data.name.trim().toLowerCase();
+      let isFromSelectedStore = true;
+
+      if (selectedStore) {
+        isFromSelectedStore = selectedStore.id === data.storeId;
+      }
+
+      return cleanedItemName.match(cleanedValue) && isFromSelectedStore;
+    });
+
+    return filteredSuggestions;
+  }
+
+  function getItemsSuggestions(searchValue: string) {
+    return _filterItems(searchValue, fakeItemFetchFromDB);
   }
 
   //ADD TO BASKET
@@ -96,20 +139,21 @@ function BBItemSearch() {
     <div>
       <div>
         <BBAutocomplete<Store>
-          suggestionsDataSource={storeList}
+          getSuggestions={getStoreSuggestions}
           selected={selectedStore}
           onSelect={handleStoreSelect}
           onCreateNew={handleCreateNewStore}
+          isCreatable={true}
           placeHolder="Search Store"
         />
       </div>
       <div>
         <BBAutocomplete<StoreItem>
-          suggestionsDataSource={filteredItems}
+          getSuggestions={getItemsSuggestions}
           selected={selectedItem}
           onSelect={handleItemSelect}
           onCreateNew={handleCreateNewItem}
-          showCreateOptionAlways={selectedStore === undefined}
+          isCreatable={true}
           placeHolder="Search Item"
         />
 

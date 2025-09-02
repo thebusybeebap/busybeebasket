@@ -1,45 +1,29 @@
 import { useRef, useState } from "react";
-
+//consider replacing with @mui/base/useAutocomplete in the future
 export interface BBSearchable {
+  id: string;
   name: string;
 }
 
 function BBAutocomplete<T extends BBSearchable>({
-  suggestionsDataSource,
-  selected,
+  getSuggestions,
   onSelect,
+  selected,
   onCreateNew,
-  showCreateOptionAlways,
+  isCreatable = false,
   placeHolder,
 }: {
-  suggestionsDataSource: Array<T>; //TODO: should be changed into a fetch/query data function, fetch/query from onlineDB/cache/local, realtime data manipulation should be enabled
+  getSuggestions: (searchValue: string) => T[];
+  onSelect: (selected?: T) => void;
   selected?: T;
-  onSelect?: (selected?: T) => void;
   onCreateNew?: (name: string) => T;
-  showCreateOptionAlways?: boolean;
+  isCreatable?: boolean;
   placeHolder?: string;
 }) {
   let [searchValue, setSearchValue] = useState(selected?.name ?? "");
   let [suggestions, setSuggestions] = useState<Array<T>>([]);
-  let [hideNewOption, setHideNewOption] = useState(true);
+  let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
-
-  function _filterSuggestions(value: string) {
-    let cleanedValue = value.trim().toLowerCase();
-    let hasExactMatch = false;
-
-    // useMemo?
-    let filteredSuggestions = suggestionsDataSource.filter((item) => {
-      let cleanedItemName = item.name.trim().toLowerCase();
-      let isCurrentMatched = cleanedItemName === cleanedValue;
-      hasExactMatch = hasExactMatch || isCurrentMatched; // to refactor, how to do this outside this function but still no extra search
-      return cleanedItemName.match(cleanedValue);
-    });
-
-    setHideNewOption(showCreateOptionAlways || hasExactMatch);
-
-    return filteredSuggestions;
-  }
 
   function _focusOnSearchInput() {
     if (searchInputRef.current) {
@@ -52,10 +36,12 @@ function BBAutocomplete<T extends BBSearchable>({
 
     setSearchValue(selected.name);
 
-    if (typeof onSelect === "function") {
-      onSelect(selected);
-    }
+    onSelect(selected);
+
+    setSuggestions([]);
+    setShowCreateOption(false);
   }
+
   function handleCreateNewOption(name: string) {
     _focusOnSearchInput();
 
@@ -63,19 +49,18 @@ function BBAutocomplete<T extends BBSearchable>({
     if (typeof onCreateNew === "function") {
       newOption = onCreateNew(name);
 
-      if (typeof onSelect === "function") {
-        onSelect(newOption);
-      }
+      onSelect(newOption);
+
+      setSuggestions([]);
+      setShowCreateOption(false);
     }
   }
 
   function handleSearchClear() {
     setSearchValue("");
     setSuggestions([]);
-    setHideNewOption(true);
-    if (typeof onSelect === "function") {
-      onSelect();
-    }
+    setShowCreateOption(false);
+    onSelect();
   }
 
   function resetNoSelected() {
@@ -85,25 +70,28 @@ function BBAutocomplete<T extends BBSearchable>({
       setSearchValue("");
     }
     setSuggestions([]);
-    setHideNewOption(true);
+    setShowCreateOption(false);
   }
 
+  //consider react-window to virtualize list of large number of options to render
   function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
     let newSearchValue = event.target.value;
     setSearchValue(newSearchValue);
 
-    if (newSearchValue === "") {
+    if (newSearchValue === "" || newSearchValue === undefined) {
       setSuggestions([]);
-      setHideNewOption(true);
-      if (typeof onSelect === "function") {
-        onSelect();
-      }
+      setShowCreateOption(false);
+      onSelect();
       return;
     }
-
-    let searchedSuggestions = _filterSuggestions(newSearchValue);
-
+    let searchedSuggestions = getSuggestions(newSearchValue);
     setSuggestions(searchedSuggestions);
+
+    let hasMatch = searchedSuggestions.some(
+      (data) =>
+        data.name.trim().toLowerCase() === newSearchValue.trim().toLowerCase()
+    ); // FOR ITEM, IT'S IDEAL THAT YOU CAN STILL CREATE EVEN IF ITEM NAME MATCH, NEED TO CHANGE THIS
+    setShowCreateOption(!hasMatch);
   }
 
   return (
@@ -132,19 +120,22 @@ function BBAutocomplete<T extends BBSearchable>({
       </div>
 
       <ul>
-        {suggestions.map((suggestion, index) => {
+        {suggestions.map((suggestion) => {
           return (
-            <li onMouseDown={() => handleSelect(suggestion)} key={index}>
+            <li
+              onMouseDown={() => handleSelect(suggestion)}
+              key={suggestion.id}
+            >
               {suggestion.name}
             </li>
           );
         })}
 
-        {hideNewOption ? null : (
-          <li onMouseDown={() => handleCreateNewOption(searchValue)}>
+        {isCreatable && showCreateOption ? (
+          <li onMouseDown={() => handleCreateNewOption(searchValue)} key="new">
             {'Add New "' + searchValue + '"'}
           </li>
-        )}
+        ) : null}
       </ul>
     </div>
   );
