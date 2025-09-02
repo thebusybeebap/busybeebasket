@@ -11,13 +11,15 @@ function BBAutocomplete<T extends BBSearchable>({
   selected,
   onCreateNew,
   isCreatable = false,
+  matchingOptions,
   placeHolder,
 }: {
   getSuggestions: (searchValue: string) => T[];
   onSelect: (selected?: T) => void;
   selected?: T;
   onCreateNew?: (name: string) => T;
-  isCreatable?: boolean;
+  isCreatable?: boolean | "always";
+  matchingOptions?: (toMatch: T) => boolean;
   placeHolder?: string;
 }) {
   let [searchValue, setSearchValue] = useState(selected?.name ?? "");
@@ -25,6 +27,7 @@ function BBAutocomplete<T extends BBSearchable>({
   let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
 
+  // check if working properly
   function _focusOnSearchInput() {
     if (searchInputRef.current) {
       searchInputRef.current.focus();
@@ -32,19 +35,16 @@ function BBAutocomplete<T extends BBSearchable>({
   }
 
   function handleSelect(selected: T) {
-    _focusOnSearchInput();
-
     setSearchValue(selected.name);
 
     onSelect(selected);
 
     setSuggestions([]);
     setShowCreateOption(false);
+    _focusOnSearchInput();
   }
 
   function handleCreateNewOption(name: string) {
-    _focusOnSearchInput();
-
     let newOption: T;
     if (typeof onCreateNew === "function") {
       newOption = onCreateNew(name);
@@ -54,6 +54,7 @@ function BBAutocomplete<T extends BBSearchable>({
       setSuggestions([]);
       setShowCreateOption(false);
     }
+    _focusOnSearchInput();
   }
 
   function handleSearchClear() {
@@ -87,10 +88,15 @@ function BBAutocomplete<T extends BBSearchable>({
     let searchedSuggestions = getSuggestions(newSearchValue);
     setSuggestions(searchedSuggestions);
 
-    let hasMatch = searchedSuggestions.some(
-      (data) =>
-        data.name.trim().toLowerCase() === newSearchValue.trim().toLowerCase()
-    ); // FOR ITEM, IT'S IDEAL THAT YOU CAN STILL CREATE EVEN IF ITEM NAME MATCH, NEED TO CHANGE THIS
+    let hasMatch = searchedSuggestions.some((data) => {
+      let nameMatched =
+        data.name.trim().toLowerCase() === newSearchValue.trim().toLowerCase();
+      let optionsMatched = true;
+      if (typeof matchingOptions === "function") {
+        optionsMatched = matchingOptions(data);
+      }
+      return nameMatched && optionsMatched;
+    });
     setShowCreateOption(!hasMatch);
   }
 

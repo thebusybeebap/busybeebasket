@@ -97,6 +97,10 @@ function BBItemSearch() {
     return newItem;
   }
 
+  function handleItemInStoreFilter(item: StoreItem): boolean {
+    return item.storeId === selectedStore?.id;
+  }
+
   //ITEMS SEARCH FILTER
   function _filterItems(
     searchValue: string,
@@ -154,6 +158,7 @@ function BBItemSearch() {
           onSelect={handleItemSelect}
           onCreateNew={handleCreateNewItem}
           isCreatable={true}
+          matchingOptions={handleItemInStoreFilter}
           placeHolder="Search Item"
         />
 
