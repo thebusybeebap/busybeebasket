@@ -1,11 +1,11 @@
 import PWABadge from "./PWABadge.tsx";
 import "./App.css";
-import BBItemSearch from "./components/BBItemSearch.tsx";
+import BBBasket from "./features/BBBasket.tsx";
 
 function App() {
   return (
     <>
-      <BBItemSearch />
+      <BBBasket />
       <PWABadge />
     </>
   );
