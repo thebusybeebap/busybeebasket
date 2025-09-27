@@ -39,7 +39,7 @@ bbbdb.version(1).stores({
 });
 
 bbbdb.on("populate", function(transaction) {  //Items with no Shops
-  transaction.table('shops').add({id: generateId(), name: "none"});
+  transaction.table('shops').add({id: generateId(), name: "NONE"});
 });
 
 export default bbbdb;

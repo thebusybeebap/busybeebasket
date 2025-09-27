@@ -18,7 +18,7 @@ function BBItemSearch({
   let [shopSearchValue, setShopSearchValue] = useState("");
 
   let [selectedItem, setSelectedItem] = useState<ShopItem>();
-  let {fetchShopItemsWithFilter, fetchAnyShopItemsWithFilter, createShopItem, isShopItemLoading} = useShopItem();
+  let {fetchItemsInShopByName, fetchItemsInAllShopsByName, createShopItem, isShopItemLoading} = useShopItem();
   let [itemSearchValue, setItemSearchValue] = useState("");
 
   //SHOP
@@ -95,7 +95,7 @@ function BBItemSearch({
     return newShopItem as ShopItem;
   }
 
-  function handleItemInShopFilter(item: ShopItem): boolean {
+  function isItemInShop(item: ShopItem): boolean {
     if(selectedShop){
       return(item.shopId === selectedShop.id);
     }
@@ -105,15 +105,12 @@ function BBItemSearch({
   }
 
   async function getItemsSuggestions(searchQuery: string) {
-    let shopItems: ShopItem[] = [];
+    let shopItems: ShopItem[] | undefined = []; // TODO: refactor useShopItems function to not return undefined
+    let hasExactMatch = false;
 
     if(selectedShop){
       try{
-        shopItems = await fetchShopItemsWithFilter(
-          selectedShop.id,
-          searchQuery,
-          FilterStrategies.filterByName
-        );
+        ({shopItems, hasExactMatch} = await fetchItemsInShopByName(selectedShop.id, searchQuery));
       }
       catch(error){
         console.error("Failed to fetch shop items:", error);
@@ -121,17 +118,14 @@ function BBItemSearch({
     }
     else{
       try{
-        shopItems = await fetchAnyShopItemsWithFilter(
-          searchQuery,
-          FilterStrategies.filterByName
-        );
+        ({shopItems, hasExactMatch} = await fetchItemsInAllShopsByName(searchQuery));
       }
       catch(error){
         console.error("Failed to fetch shop items:", error);
       }
     }
       
-    return shopItems;
+    return shopItems ?? []; //TO UPDATE
   }
  // showNew setup TOO for Shops, still showing new item option even exact match
   return (
@@ -153,7 +147,7 @@ function BBItemSearch({
           selected={selectedItem}
           onSelect={handleItemSelect}
           onCreateNew={handleCreateNewItem}
-          showNew={handleItemInShopFilter}
+          showNew={isItemInShop}
           placeHolder="Search Item"
           searchValue={itemSearchValue}
           updateSearchValue={setItemSearchValue}

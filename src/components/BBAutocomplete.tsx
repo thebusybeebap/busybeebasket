@@ -135,7 +135,7 @@ function BBAutocomplete<T extends BBSearchable>({
         />
       </div>
 
-      <ul className="border">
+      <ul className="absolute z-10 w-full ml-1 p-1 bg-red-700 shadow-lg">
         {suggestions.map((suggestion) => {
           return (
             <li
