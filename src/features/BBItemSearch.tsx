@@ -6,19 +6,17 @@ import useShopItem from "../hooks/useShopItem";
 import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 
-import { FilterStrategies } from "../utils/FilterStrategies";
-
 function BBItemSearch({
   onSearchDone
 }:{
   onSearchDone: (searchedItem: ShopItem | undefined)=>void
 }) {
   let [selectedShop, setSelectedShop] = useState<Shop>();
-  let {fetchShopsWithFilter, createShop, isShopLoading} = useShop();
+  let {fetchShopsByNameQuery, createShop, isShopLoading} = useShop();
   let [shopSearchValue, setShopSearchValue] = useState("");
 
   let [selectedItem, setSelectedItem] = useState<ShopItem>();
-  let {fetchItemsInShopByName, fetchItemsInAllShopsByName, createShopItem, isShopItemLoading} = useShopItem();
+  let { fetchItemsInShopByNameQuery, fetchItemsInAllShopsByNameQuery, createShopItem, isShopItemLoading} = useShopItem();
   let [itemSearchValue, setItemSearchValue] = useState("");
 
   //SHOP
@@ -47,13 +45,16 @@ function BBItemSearch({
 
   async function getShopSuggestions(searchQuery: string) {
     let shops: Shop[] = [];
+    let hasExactMatch = false;
     try{
-       shops = await fetchShopsWithFilter(searchQuery, FilterStrategies.filterByName); 
+      ({shops, hasExactMatch} = await fetchShopsByNameQuery(searchQuery)); //is enclosing in () the best to do here?
     }
     catch(error){
       console.error("Failed to fetch Shops:", error);
     }
-    return shops as Shop[];
+    finally{
+      return({suggestionsResult: shops, hasExactMatch});
+    }
   }
 
   //ITEM
@@ -105,12 +106,12 @@ function BBItemSearch({
   }
 
   async function getItemsSuggestions(searchQuery: string) {
-    let shopItems: ShopItem[] | undefined = []; // TODO: refactor useShopItems function to not return undefined
+    let shopItems: ShopItem[] = []; // TODO: refactor useShopItems function to not return undefined
     let hasExactMatch = false;
 
     if(selectedShop){
       try{
-        ({shopItems, hasExactMatch} = await fetchItemsInShopByName(selectedShop.id, searchQuery));
+        ({shopItems, hasExactMatch} = await fetchItemsInShopByNameQuery(selectedShop.id, searchQuery));
       }
       catch(error){
         console.error("Failed to fetch shop items:", error);
@@ -118,14 +119,14 @@ function BBItemSearch({
     }
     else{
       try{
-        ({shopItems, hasExactMatch} = await fetchItemsInAllShopsByName(searchQuery));
+        ({shopItems, hasExactMatch} = await fetchItemsInAllShopsByNameQuery(searchQuery));
       }
       catch(error){
         console.error("Failed to fetch shop items:", error);
       }
     }
-      
-    return shopItems ?? []; //TO UPDATE
+    return({suggestionsResult: shopItems, hasExactMatch});
+    //return shopItems ?? []; //TO UPDATE
   }
  // showNew setup TOO for Shops, still showing new item option even exact match
   return (
@@ -147,7 +148,7 @@ function BBItemSearch({
           selected={selectedItem}
           onSelect={handleItemSelect}
           onCreateNew={handleCreateNewItem}
-          showNew={isItemInShop}
+          //showNew={isItemInShop}
           placeHolder="Search Item"
           searchValue={itemSearchValue}
           updateSearchValue={setItemSearchValue}

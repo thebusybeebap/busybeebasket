@@ -1,4 +1,4 @@
-export namespace FilterStrategies {
+export namespace FilterStrategies{
 
   export interface WithNameProperty{
     name: string;

@@ -5,14 +5,23 @@ export interface BBSearchable{
   name: string;
 }
 
+export interface BBSuggestive<T>{
+  suggestionsResult: T[];
+  hasExactMatch?: boolean;
+}
+
+export interface BBSuggestiveFunction<T>{
+  (searchQuery: string): Promise<BBSuggestive<T>>;
+}
+
 export interface BBAutocompleteProps<T>{
   searchValue: string;
   updateSearchValue: (val: string) => void
-  suggestionsFunction: (searchQuery: string) => Promise<T[]>;
+  suggestionsFunction: BBSuggestiveFunction<T>;
   selected: T | undefined;
   onSelect: (selected?: T) => void;
   onCreateNew?: <T extends BBSearchable>(name: string) => Promise<T>;
-  showNew?: (toMatch: T) => boolean;
+  //showNew?: (toMatch: T) => boolean;
   placeHolder?: string;
 }
 
@@ -23,7 +32,7 @@ function BBAutocomplete<T extends BBSearchable>({
   selected,
   onSelect,
   onCreateNew,
-  showNew, // boolean state prop
+  //showNew, // boolean state prop
   placeHolder,
 }: BBAutocompleteProps<T>) {
 
@@ -83,11 +92,12 @@ function BBAutocomplete<T extends BBSearchable>({
       onSelect();
       return;
     }
-    
-    suggestionsFunction(newSearchValue).then((suggestionsResult)=>{
-      setSuggestions(suggestionsResult);
 
-      if(typeof showNew === "function"){// this needs to be moved to persist layer, since there will be an issue if we limit the suggestions returned to 10, and we support multiple shop selection, simple solution would be limit number of suggestions same to the limit of multiple shops user can select
+    suggestionsFunction(newSearchValue).then(({suggestionsResult, hasExactMatch})=>{
+      setSuggestions(suggestionsResult);
+      setShowCreateOption(hasExactMatch ?? false);
+
+      /*if(typeof showNew === "function"){// this needs to be moved to persist layer, since there will be an issue if we limit the suggestions returned to 10, and we support multiple shop selection, simple solution would be limit number of suggestions same to the limit of multiple shops user can select
         let isSearchValueExactMatch = suggestionsResult.some(
           (element) => element.name.trim().toLowerCase() === newSearchValue.trim().toLowerCase()
         );
@@ -96,13 +106,14 @@ function BBAutocomplete<T extends BBSearchable>({
       }
       else{
         setShowCreateOption(true);
-      }
+      }*/
+     
     });
   }
 
   function populateSuggestionsFromSelected(event: React.FocusEvent<HTMLInputElement>) {
     if(selected){
-      suggestionsFunction(selected.name).then((suggestionsResult)=>{
+      suggestionsFunction(selected.name).then(({suggestionsResult})=>{
         setSuggestions(suggestionsResult);
         setShowCreateOption(false);
       });

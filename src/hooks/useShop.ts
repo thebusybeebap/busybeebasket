@@ -1,29 +1,28 @@
 import { useState } from "react";
-import bbbdb, { generateId, ShopPersistStorage } from "../data/bbddb";
+import bbbdb, { generateId, ShopPersistStorage } from "../services/bbddb";
 import { Shop } from "../data/models";
+import { PersistShops } from "../services/Shops";
+import { PagingStrategies } from "../utils/PagingStrategies";
 
-function useShop(){
+const PAGE_SIZE = 10;
+
+function useShop(){ // ADD EXACT MATCH, easier than shopitem
   let [isShopLoading, setIsShopLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time
 
-  async function fetchShopsWithFilter(
+  async function fetchShopsByNameQuery(
     nameQuery: string,
-    filterFunction: (shop: ShopPersistStorage, nameQuery: string) => boolean
   ){
     setIsShopLoading(true);
-    try{
-      let shops = await bbbdb.shops
-        .filter((shop) => filterFunction(shop, nameQuery))
-        .toArray();
-
-      return shops as Shop[];
-    }
-    catch(error){
-      console.error("Failed to fetch shops:", error);
-      return Promise.reject();
-    }
-    finally{
-      setIsShopLoading(false);
-    }
+    let result = await PersistShops.fetchShopsByNameQuery(nameQuery);
+    let shopNames = new Set(result.map(shop => shop.name));
+    let hasExactMatch = shopNames.has(nameQuery);
+    
+    let {start, end} = PagingStrategies.pageIndices(0, result.length);
+    let shops = result.slice(start, end);
+    
+    setIsShopLoading(false);
+    return({shops, hasExactMatch});
+    // Add error handling later
   } // maybe add another option that uses .startsWithIgnoreCase(nameQuery) which is much faster
   
   async function createShop(newShopName: string){
@@ -53,7 +52,7 @@ function useShop(){
     }
   };
 
-  return {fetchShopsWithFilter, createShop, isShopLoading};
+  return {fetchShopsByNameQuery, createShop, isShopLoading};
 }
 
 export default useShop;

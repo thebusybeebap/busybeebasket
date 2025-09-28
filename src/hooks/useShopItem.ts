@@ -1,50 +1,14 @@
-import bbbdb, {generateId, ItemPersistStorage, ShopItemPersistStorage, ShopPersistStorage} from "../data/bbddb"; 
+import bbbdb, {generateId, ItemPersistStorage, ShopItemPersistStorage, ShopPersistStorage} from "../services/bbddb"; 
 import { ShopItem } from "../data/models";
 import { useState } from "react";
 
 import { FilterStrategies } from "../utils/FilterStrategies";
+import { PersistShops } from "../services/Shops";
+import { PersistItems } from "../services/Items";
+import { PersistShopItems } from "../services/ShopItems";
+import { PagingStrategies } from "../utils/PagingStrategies";
 
 const PAGE_SIZE = 10;
-
-async function getNoneShop(){
-  let noneShop = await bbbdb.shops.get({name: "NONE"});
-  return noneShop;
-}
-
-async function fetchItemsByName(nameQuery: string){
-  let items = await bbbdb.items
-    .filter((item) => FilterStrategies.filterByName(item, nameQuery))
-    .toArray();
-  return items;
-}
-
-async function fetchShopsById(shopId: string){
-  let shops = await bbbdb.shops 
-    .where("id")
-    .anyOf([shopId])
-    .toArray();
-  return shops;
-}
-
-async function fetchShopItemsByShopId(shopId: string){
-  let shopItems = await bbbdb.shopItems 
-    .where("shopId")
-    .anyOf([shopId])
-    .toArray();
-  return shopItems;
-}
-
-async function fetchAllShopItems(){
-  let shopItems = await bbbdb.shopItems
-    .toArray();
-  return shopItems;
-}
-
-async function fetchAllShops(){
-  let shops = await bbbdb.shops
-    .toArray();
-  return shops;
-}
 
 function generateShopItems(
   baseDetailItems: ShopItemPersistStorage[],
@@ -68,37 +32,28 @@ function generateShopItems(
   return result;
 }
 
-//TODO: //this is logical because filtering is actually done on persistence level and not on app layer
-//-remove filterfunction params, directly import it
-//-add the portion for returning if there's exact match or not, added boolen value.
-//OR MAYBE CHECK IF RETURN ARRAY IS ONLY 1
-
-//notes: 2 cases, 
-// noshopselected, searches all shops: if name is exact match query AND shop is equal to "none" 
-// 1selectedshop: if name is exact match with query no need to show new option, cant just check if 1 is returned cause "apple" would return both "apple" and "apple pie"
-
 function useShopItem(){
   let [isShopItemLoading, setIsShopItemLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time(replace with a string based status), also with multiple calls of same function(should debounce)
   // multiple functions running could be solved by separating into different hooks, then debounce for same function running
 
   //add param exactMatchFunction, return value {shopItems: ShopItem[], hasExactMatch: boolean}
-  async function fetchItemsInShopByName(shopId: string, nameQuery: string,){ // single shop
+  async function fetchItemsInShopByNameQuery(shopId: string, nameQuery: string,){ // single shop
     setIsShopItemLoading(true);
+    let emptyArray: ShopItem[] = []; // to rewrite better
+    let hasExactMatch = false;
     try{
       let result = await bbbdb.transaction('r', [bbbdb.items, bbbdb.shopItems, bbbdb.shops], async () => {
-        let hasExactMatch = false;
-        let emptyArray: ShopItem[] = []; // to rewrite better
 
-        let itemsWithNameQuery = await fetchItemsByName(nameQuery);
+        let itemsWithNameQuery = await PersistItems.fetchItemsByNameQuery(nameQuery);
         if(itemsWithNameQuery.length === 0) return({emptyArray, hasExactMatch});
 
         let itemDetails = new Map(itemsWithNameQuery.map(item => [item.id, item]));
         let itemIds = new Set(itemDetails.keys());
 
-        let itemsInShop = await fetchShopItemsByShopId(shopId); //to support multiple shops in future
+        let itemsInShop = await PersistShopItems.fetchShopItemsByShopId(shopId); //to support multiple shops in future
         if(itemsInShop.length === 0) return({emptyArray, hasExactMatch});
 
-        let selectedShops = await fetchShopsById(shopId);
+        let selectedShops = await PersistShops.fetchShopsById(shopId);
         if(selectedShops.length === 0) return({emptyArray, hasExactMatch});
         
         let shopDetails = new Map(selectedShops.map(shop => [shop.id, shop]));
@@ -106,22 +61,19 @@ function useShopItem(){
         let itemsInShopWithNameQuery = itemsInShop.filter((item)=>FilterStrategies.filterByIdInSet(item,itemIds));
 
         let result = generateShopItems(itemsInShopWithNameQuery, itemDetails, shopDetails);
-        if(result.length === 0 ){
-          return({emptyArray, hasExactMatch});
-        }
+        if(result.length === 0 ) return({emptyArray, hasExactMatch});
 
         // exactMatch is set regardless if matched item is part of page
         let itemNames = new Set(itemsWithNameQuery.map(item => item.name));
         hasExactMatch = itemNames.has(nameQuery);
 
-        let page = 1;
-        let offset = page - 1;
-        let shopItems = result.slice(offset, offset + PAGE_SIZE);
+        let {start, end} = PagingStrategies.pageIndices(0, result.length);
+        let shopItems = result.slice(start, end);
 
         return({shopItems, hasExactMatch}); // to rewrite structure
       });
 
-      return result;
+      return({shopItems: result.shopItems ?? [], hasExactMatch: result.hasExactMatch}); //TODO, write this BETTER
     }
     catch(error){
       console.log("Error fetching Items:", error);
@@ -132,23 +84,23 @@ function useShopItem(){
     }
   }
 
-  async function fetchItemsInAllShopsByName(nameQuery: string){
-    setIsShopItemLoading(true);
-    try{
+  async function fetchItemsInAllShopsByNameQuery(nameQuery: string){
+    //setIsShopItemLoading(true);
+    let hasExactMatch = false;
+    let emptyArray: ShopItem[] = []; // to rewrite better
+    //try{
       let result = await bbbdb.transaction('r', [bbbdb.items, bbbdb.shopItems, bbbdb.shops], async () => {
-        let hasExactMatch = false;
-        let emptyArray: ShopItem[] = []; // to rewrite better
 
-        let itemsWithNameQuery = await fetchItemsByName(nameQuery);
+        let itemsWithNameQuery = await PersistItems.fetchItemsByNameQuery(nameQuery);
         if(itemsWithNameQuery.length === 0) return({emptyArray, hasExactMatch});
 
         let itemDetails = new Map(itemsWithNameQuery.map(item => [item.id, item]));
         let itemIds = new Set(itemDetails.keys());
 
-        let itemsInAllShops = await fetchAllShopItems();
+        let itemsInAllShops = await PersistShopItems.fetchAllShopItems();
         if(itemsInAllShops.length === 0) return({emptyArray, hasExactMatch});
 
-        let allShops = await fetchAllShops();
+        let allShops = await PersistShops.fetchAllShops();
         if(allShops.length === 0) return({emptyArray, hasExactMatch});
         
         let shopDetails = new Map(allShops.map(shop => [shop.id, shop]));
@@ -156,12 +108,10 @@ function useShopItem(){
         let itemsInShopWithNameQuery = itemsInAllShops.filter((item)=>FilterStrategies.filterByIdInSet(item,itemIds));
 
         let result = generateShopItems(itemsInShopWithNameQuery, itemDetails, shopDetails);
-        if(result.length === 0 ){
-          return({emptyArray, hasExactMatch});
-        }
+        if(result.length === 0) return({emptyArray, hasExactMatch});
 
         // exactMatch is set regardless if matched item is part of page
-        let noneShop = await getNoneShop();
+        let noneShop = await PersistShops.getNoneShop();
         if(noneShop){ //if name is exact match and it's shop is none, hasMatch = true = hide create option
           hasExactMatch = result.some((shopItem) => {
             return (
@@ -171,31 +121,30 @@ function useShopItem(){
           });          
         }
 
-        let page = 1;
-        let offset = page - 1;
-        let shopItems = result.slice(offset, offset + PAGE_SIZE);
+        let {start, end} = PagingStrategies.pageIndices(0, result.length);
+        let shopItems = result.slice(start, end) ?? [];
 
-        return {shopItems: shopItems, hasExactMatch: hasExactMatch};
+        return({shopItems, hasExactMatch});
       });
-
-      return result;
-    }
-    catch(error){
-      console.log("Error fetching Items:", error);
-      return Promise.reject();
-    }
-    finally{
-      setIsShopItemLoading(false);
-    }
+      return({shopItems: result.shopItems ?? [], hasExactMatch: result.hasExactMatch}); //TODO, write this BETTER
+      //return result as {shopItems: ShopItem[], hasExactMatch: boolean};
+    //}
+    //catch(error){
+    //  console.log("Error fetching Items:", error);
+      //return Promise.reject();
+    //  throw error;
+    //}
+    //finally{
+      //setIsShopItemLoading(false);
+    //}
   }
 
-  async function createShopItem({shopId, newItemName}: {shopId?: string, newItemName: string}){
+  async function createShopItem({shopId, newItemName}: {shopId?: string, newItemName: string}){ //TO REFACTOR
     setIsShopItemLoading(true);
-
     try {
       let result = await bbbdb.transaction('rw', [bbbdb.items, bbbdb.shopItems, bbbdb.shops], async () => {
         if(!shopId){
-          let noShop = await bbbdb.shops.get({name: "none"});
+          let noShop = await PersistShops.getNoneShop();
           if(noShop){
             shopId = noShop.id;
           }
@@ -245,7 +194,7 @@ function useShopItem(){
     }
   };
 
-  return {fetchItemsInShopByName, fetchItemsInAllShopsByName, createShopItem, isShopItemLoading};
+  return {fetchItemsInShopByNameQuery, fetchItemsInAllShopsByNameQuery, createShopItem, isShopItemLoading};
 }
 
 export default useShopItem;
