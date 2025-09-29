@@ -40,18 +40,18 @@ function BBAutocomplete<T extends BBSearchable>({
   let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
 
-  function _focusOnSearchInput() {
+  /*function _focusOnSearchInput() {
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
-  }
+  }*/
 
   function handleSelect(selected: T) {
     onSelect(selected);
     updateSearchValue(selected.name);
     setSuggestions([]);
     setShowCreateOption(false);
-    _focusOnSearchInput();
+    //_focusOnSearchInput();
   }
 
   function handleCreateNewOption(name: string) {
@@ -60,7 +60,7 @@ function BBAutocomplete<T extends BBSearchable>({
         updateSearchValue(result.name);
         setSuggestions([]);
         setShowCreateOption(false);
-        _focusOnSearchInput()
+        //_focusOnSearchInput();
       });
     }
   }

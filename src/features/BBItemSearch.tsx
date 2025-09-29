@@ -29,7 +29,10 @@ function BBItemSearch({
     if (shop) {
       setSelectedShop(shop);
       if(selectedItem){
-        if(selectedItem.shopId !== shop.id) setSelectedItem(undefined);
+        if(selectedItem.shopId !== shop.id){
+          setSelectedItem(undefined);
+          setItemSearchValue("");
+        }
       }
     } else {
       setSelectedShop(undefined);
@@ -37,20 +40,14 @@ function BBItemSearch({
   }
 
   async function handleCreateNewShop<Shop>(name: string){
-    let newShop;
-    
-    try{
-      newShop = await createShop(name);
-    }
-    catch(error){
-      console.error("Failed to create new shop:", error);
-    }
+    //TODO: add error handling
+    let newShop = await createShop(name);
 
     setSelectedShop(newShop);
     setShopSearchValue(name);
     //new shop has no items yet
-    setSelectedItem(undefined);
-    setItemSearchValue("");
+    setSelectedItem(undefined); //why does this not triger rerender for item input?
+    setItemSearchValue(""); //why does this not triger rerender for item input?
 
     return newShop as Shop;
   }
@@ -70,7 +67,11 @@ function BBItemSearch({
   }
 
 //TOCHECK is when selecting items, updating shop inpput accordingly, and vice versa
-//item input on create new, still showing suggestions, TOFIX
+//FIXED: item input on create new, still showing suggestions
+
+//FIXED: Creating New Shop doesn't update suggestions properly, removed autofocus back on input after selection
+//WORKING: Create New Shop NOT clearing selected item even not in shop
+//FIXED: Selecting a Shop, NOT clearing selected item even not in shop
 
   //ITEM
   function handleItemSelect(item?: ShopItem) {
