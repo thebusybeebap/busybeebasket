@@ -5,6 +5,11 @@ import useShopItem from "../hooks/useShopItem";
 
 import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
+import ShopItemDetails from "../components/ShopItemDetails";
+
+// changes on both here and autocomplete component
+// in suggestions, display shop name and [price](no way to create/add right now)
+// make it that it can be customized, can display any property
 
 function BBItemSearch({
   onSearchDone
@@ -23,6 +28,9 @@ function BBItemSearch({
   function handleShopSelect(shop?: Shop) {
     if (shop) {
       setSelectedShop(shop);
+      if(selectedItem){
+        if(selectedItem.shopId !== shop.id) setSelectedItem(undefined);
+      }
     } else {
       setSelectedShop(undefined);
     }
@@ -39,6 +47,10 @@ function BBItemSearch({
     }
 
     setSelectedShop(newShop);
+    setShopSearchValue(name);
+    //new shop has no items yet
+    setSelectedItem(undefined);
+    setItemSearchValue("");
 
     return newShop as Shop;
   }
@@ -57,6 +69,9 @@ function BBItemSearch({
     }
   }
 
+//TOCHECK is when selecting items, updating shop inpput accordingly, and vice versa
+//item input on create new, still showing suggestions, TOFIX
+
   //ITEM
   function handleItemSelect(item?: ShopItem) {
     //TODO: to filter Shop selections when an item is selected, based if item is in Shop
@@ -64,12 +79,12 @@ function BBItemSearch({
       setSelectedItem(item);
       onSearchDone(item);
       
-      if(!selectedShop && item.shopName !== "none"){
+      if(!selectedShop && item.shopName !== "NONE"){ // TODO REFACTOR "NONE" handling
         let shopFromSelectedItem = { //find better way of doing this
           id: item.shopId,
           name: item.shopName
         }
-        setSelectedShop(shopFromSelectedItem); // !!! ONLY updates the selectedShop state here but not the 
+        setSelectedShop(shopFromSelectedItem);
         setShopSearchValue(shopFromSelectedItem.name); // do this for shop select also, clear item if item is not in selected shop
         // search value on autocomplete component
       }
@@ -96,15 +111,6 @@ function BBItemSearch({
     return newShopItem as ShopItem;
   }
 
-  function isItemInShop(item: ShopItem): boolean {
-    if(selectedShop){
-      return(item.shopId === selectedShop.id);
-    }
-    else{
-      return(item.shopName === "none");
-    }
-  }
-
   async function getItemsSuggestions(searchQuery: string) {
     let shopItems: ShopItem[] = []; // TODO: refactor useShopItems function to not return undefined
     let hasExactMatch = false;
@@ -126,9 +132,8 @@ function BBItemSearch({
       }
     }
     return({suggestionsResult: shopItems, hasExactMatch});
-    //return shopItems ?? []; //TO UPDATE
   }
- // showNew setup TOO for Shops, still showing new item option even exact match
+
   return (
     <div>
       <div>
@@ -148,10 +153,10 @@ function BBItemSearch({
           selected={selectedItem}
           onSelect={handleItemSelect}
           onCreateNew={handleCreateNewItem}
-          //showNew={isItemInShop}
           placeHolder="Search Item"
           searchValue={itemSearchValue}
           updateSearchValue={setItemSearchValue}
+          suggestionsDetails={(item)=>ShopItemDetails(item, !selectedShop)}
         />
       </div>
     </div>

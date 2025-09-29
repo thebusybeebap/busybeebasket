@@ -4,9 +4,7 @@ import { Shop } from "../data/models";
 import { PersistShops } from "../services/Shops";
 import { PagingStrategies } from "../utils/PagingStrategies";
 
-const PAGE_SIZE = 10;
-
-function useShop(){ // ADD EXACT MATCH, easier than shopitem
+function useShop(){
   let [isShopLoading, setIsShopLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time
 
   async function fetchShopsByNameQuery(

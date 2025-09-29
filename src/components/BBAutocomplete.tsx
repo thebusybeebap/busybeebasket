@@ -21,8 +21,8 @@ export interface BBAutocompleteProps<T>{
   selected: T | undefined;
   onSelect: (selected?: T) => void;
   onCreateNew?: <T extends BBSearchable>(name: string) => Promise<T>;
-  //showNew?: (toMatch: T) => boolean;
   placeHolder?: string;
+  suggestionsDetails?: (item: T) => React.ReactNode;
 }
 
 function BBAutocomplete<T extends BBSearchable>({
@@ -32,12 +32,12 @@ function BBAutocomplete<T extends BBSearchable>({
   selected,
   onSelect,
   onCreateNew,
-  //showNew, // boolean state prop
   placeHolder,
+  suggestionsDetails
 }: BBAutocompleteProps<T>) {
 
   let [suggestions, setSuggestions] = useState<Array<T>>([]);
-  let [showCreateOption, setShowCreateOption] = useState(false); // Move out?
+  let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
 
   function _focusOnSearchInput() {
@@ -95,19 +95,7 @@ function BBAutocomplete<T extends BBSearchable>({
 
     suggestionsFunction(newSearchValue).then(({suggestionsResult, hasExactMatch})=>{
       setSuggestions(suggestionsResult);
-      setShowCreateOption(hasExactMatch ?? false);
-
-      /*if(typeof showNew === "function"){// this needs to be moved to persist layer, since there will be an issue if we limit the suggestions returned to 10, and we support multiple shop selection, simple solution would be limit number of suggestions same to the limit of multiple shops user can select
-        let isSearchValueExactMatch = suggestionsResult.some(
-          (element) => element.name.trim().toLowerCase() === newSearchValue.trim().toLowerCase()
-        );
-        let isFilterMatched = suggestionsResult.some((element) => showNew(element));
-        setShowCreateOption(!(isFilterMatched && isSearchValueExactMatch));
-      }
-      else{
-        setShowCreateOption(true);
-      }*/
-     
+      setShowCreateOption(!hasExactMatch);
     });
   }
 
@@ -153,7 +141,14 @@ function BBAutocomplete<T extends BBSearchable>({
               onMouseDown={() => handleSelect(suggestion)}
               key={suggestion.id}
             >
-              {suggestion.name}
+              <section>
+                <span>{suggestion.name}</span>
+              </section>
+              {suggestionsDetails ? 
+                <section>
+                  {suggestionsDetails(suggestion)}
+                </section> 
+              : null}
             </li>
           );
         })}

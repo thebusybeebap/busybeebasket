@@ -36,7 +36,6 @@ function useShopItem(){
   let [isShopItemLoading, setIsShopItemLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time(replace with a string based status), also with multiple calls of same function(should debounce)
   // multiple functions running could be solved by separating into different hooks, then debounce for same function running
 
-  //add param exactMatchFunction, return value {shopItems: ShopItem[], hasExactMatch: boolean}
   async function fetchItemsInShopByNameQuery(shopId: string, nameQuery: string,){ // single shop
     setIsShopItemLoading(true);
     let emptyArray: ShopItem[] = []; // to rewrite better
