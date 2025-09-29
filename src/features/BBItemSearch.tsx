@@ -6,10 +6,7 @@ import useShopItem from "../hooks/useShopItem";
 import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
-
-// changes on both here and autocomplete component
-// in suggestions, display shop name and [price](no way to create/add right now)
-// make it that it can be customized, can display any property
+import { ScanBarcode, SquarePlus } from "lucide-react";
 
 function BBItemSearch({
   onSearchDone
@@ -65,13 +62,6 @@ function BBItemSearch({
       return({suggestionsResult: shops, hasExactMatch});
     }
   }
-
-//TOCHECK is when selecting items, updating shop inpput accordingly, and vice versa
-//FIXED: item input on create new, still showing suggestions
-
-//FIXED: Creating New Shop doesn't update suggestions properly, removed autofocus back on input after selection
-//WORKING: Create New Shop NOT clearing selected item even not in shop
-//FIXED: Selecting a Shop, NOT clearing selected item even not in shop
 
   //ITEM
   function handleItemSelect(item?: ShopItem) {
@@ -136,8 +126,8 @@ function BBItemSearch({
   }
 
   return (
-    <div>
-      <div>
+    <div className="w-99/100 bg-blue-900 flex flex-col gap-2">
+      <div className="border-2 border-solid flex-1 p-1">
         <BBAutocomplete<Shop>
           suggestionsFunction={getShopSuggestions}
           selected={selectedShop}
@@ -148,7 +138,7 @@ function BBItemSearch({
           updateSearchValue={setShopSearchValue}
         />
       </div>
-      <div>
+      <div className="w-full flex gap-2 border-2 border-solid p-1 flex-1">
         <BBAutocomplete<ShopItem>
           suggestionsFunction={getItemsSuggestions}
           selected={selectedItem}
@@ -159,6 +149,12 @@ function BBItemSearch({
           updateSearchValue={setItemSearchValue}
           suggestionsDetails={(item)=>ShopItemDetails(item, !selectedShop)}
         />
+        <button>
+          <SquarePlus />
+        </button>
+        <button>
+          <ScanBarcode />
+        </button>
       </div>
     </div>
   );

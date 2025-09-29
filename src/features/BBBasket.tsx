@@ -27,10 +27,16 @@ function BBBasket() { // WHAT COMPONENT WILL OWN THE ADD BUTTON
   }
 
   return (
-    <div>
+    <div className="bg-green-900">
       <div>
         <BBItemSearch onSearchDone={handleAddBySearch} />
-        <button onClick={addBasketItem}>Add user Searched Item</button>
+        <button 
+          type="button"
+          className="bg-red-200" 
+          onClick={addBasketItem}
+        >
+          Add user Searched Item
+        </button>
         <button onClick={handleSearchByQR}>Add using QR button</button>
       </div>
 

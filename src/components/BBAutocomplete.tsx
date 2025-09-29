@@ -1,3 +1,4 @@
+import { CircleX } from "lucide-react";
 import { useRef, useState } from "react";
 
 export interface BBSearchable{
@@ -40,18 +41,11 @@ function BBAutocomplete<T extends BBSearchable>({
   let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
 
-  /*function _focusOnSearchInput() {
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }*/
-
   function handleSelect(selected: T) {
     onSelect(selected);
     updateSearchValue(selected.name);
     setSuggestions([]);
     setShowCreateOption(false);
-    //_focusOnSearchInput();
   }
 
   function handleCreateNewOption(name: string) {
@@ -60,7 +54,6 @@ function BBAutocomplete<T extends BBSearchable>({
         updateSearchValue(result.name);
         setSuggestions([]);
         setShowCreateOption(false);
-        //_focusOnSearchInput();
       });
     }
   }
@@ -109,19 +102,19 @@ function BBAutocomplete<T extends BBSearchable>({
   }
 
   return (
-    <div className="m-1">
-      <div className="group w-full border">
+    <div className="relative w-full">
+      <div className="group w-full text-xl">
         <button
           disabled={searchValue === ""}
           onMouseDown={handleSearchClear}
-          className={
-            searchValue === ""
-              ? "invisible"
-              : "invisible group-focus-within:visible"
-          }
+          className={"absolute right-1 top-2 z-10 opacity-40 hover:opacity-100 " 
+            + (searchValue === ""
+            ? "invisible"
+            : "invisible group-focus-within:visible")}
         >
-          Clear
+          <CircleX />
         </button>
+
         <input
           ref={searchInputRef}
           type="text"
@@ -130,22 +123,23 @@ function BBAutocomplete<T extends BBSearchable>({
           onChange={populateSuggestionsFromSearchValue}
           onFocus={populateSuggestionsFromSelected}
           onBlur={resetNoSelected}
-          className="border w-full p-1"
+          className={"border w-full py-1 pl-2 pr-7 truncate rounded-sm"}
         />
       </div>
 
-      <ul className="absolute z-10 w-full ml-1 p-1 bg-red-700 shadow-lg">
+      <ul className="absolute z-10 w-full max-w-full bg-red-700 shadow-lg">
         {suggestions.map((suggestion) => {
           return (
             <li
+              className="bg-amber-300 px-1"
               onMouseDown={() => handleSelect(suggestion)}
               key={suggestion.id}
             >
               <section>
-                <span>{suggestion.name}</span>
+                <span className="text-xl">{suggestion.name}</span>
               </section>
               {suggestionsDetails ? 
-                <section>
+                <section className="text-xs indent-2">
                   {suggestionsDetails(suggestion)}
                 </section> 
               : null}
@@ -154,11 +148,14 @@ function BBAutocomplete<T extends BBSearchable>({
         })}
 
         {showCreateOption ? (
-          <li onMouseDown={() => handleCreateNewOption(searchValue)}>
+          <li
+            className="px-1" 
+            onMouseDown={() => handleCreateNewOption(searchValue)}>
             {'Add New "' + searchValue + '"'}
           </li>
         ) : null}
       </ul>
+
     </div>
   );
 }
