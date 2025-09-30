@@ -1,12 +1,13 @@
-import Dexie, { type EntityTable } from 'dexie';
-import { v7 as uuidv7 } from "uuid"; // transfer id generation here, create a fucntion to be called by custom 
+import Dexie, { type EntityTable } from "dexie";
+import { v7 as uuidv7 } from "uuid"; // transfer id generation here, create a fucntion to be called by custom
 
-export function generateId(){
+export function generateId() {
   return uuidv7();
 }
 
 // persist layer data models
-export interface ShopPersistStorage { //naming convention for Interface from 'db'
+export interface ShopPersistStorage {
+  //naming convention for Interface from 'db'
   id: string;
   name: string;
   updatedAt: Date;
@@ -25,21 +26,22 @@ export interface ShopItemPersistStorage {
   updatedAt: Date;
 }
 
-const bbbdb = new Dexie('BBBasketDB') as Dexie & {
-  shops: EntityTable<ShopPersistStorage, 'id'>;
-  items: EntityTable<ItemPersistStorage, 'id'>;
+const bbbdb = new Dexie("BBBasketDB") as Dexie & {
+  shops: EntityTable<ShopPersistStorage, "id">;
+  items: EntityTable<ItemPersistStorage, "id">;
   // @ts-expect-error // NEED TO FIND A PROPER FIX FOR THIS
-  shopItems: EntityTable<ShopItemPersistStorage, ['shopId','itemId']>;
+  shopItems: EntityTable<ShopItemPersistStorage, ["shopId", "itemId"]>;
 };
 
 bbbdb.version(1).stores({
-  shops: '&id, &name, updatedAt',
-  items: '&id, &name, updatedAt',
-  shopItems: '&[shopId+itemId], shopId, itemId, updatedAt',
+  shops: "&id, &name, updatedAt",
+  items: "&id, &name, updatedAt",
+  shopItems: "&[shopId+itemId], shopId, itemId, updatedAt",
 });
 
-bbbdb.on("populate", function(transaction) {  //Items with no Shops
-  transaction.table('shops').add({id: generateId(), name: "NONE"});
+bbbdb.on("populate", function (transaction) {
+  //Items with no Shops
+  transaction.table("shops").add({ id: generateId(), name: "NONE" });
 });
 
 export default bbbdb;

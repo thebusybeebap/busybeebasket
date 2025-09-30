@@ -1,23 +1,23 @@
 import { CircleX } from "lucide-react";
 import { useRef, useState } from "react";
 
-export interface BBSearchable{
+export interface BBSearchable {
   id: string;
   name: string;
 }
 
-export interface BBSuggestive<T>{
+export interface BBSuggestive<T> {
   suggestionsResult: T[];
   hasExactMatch?: boolean;
 }
 
-export interface BBSuggestiveFunction<T>{
+export interface BBSuggestiveFunction<T> {
   (searchQuery: string): Promise<BBSuggestive<T>>;
 }
 
-export interface BBAutocompleteProps<T>{
+export interface BBAutocompleteProps<T> {
   searchValue: string;
-  updateSearchValue: (val: string) => void
+  updateSearchValue: (val: string) => void;
   suggestionsFunction: BBSuggestiveFunction<T>;
   selected: T | undefined;
   onSelect: (selected?: T) => void;
@@ -34,9 +34,8 @@ function BBAutocomplete<T extends BBSearchable>({
   onSelect,
   onCreateNew,
   placeHolder,
-  suggestionsDetails
+  suggestionsDetails,
 }: BBAutocompleteProps<T>) {
-
   let [suggestions, setSuggestions] = useState<Array<T>>([]);
   let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +49,7 @@ function BBAutocomplete<T extends BBSearchable>({
 
   function handleCreateNewOption(name: string) {
     if (typeof onCreateNew === "function") {
-      onCreateNew(name).then((result)=>{
+      onCreateNew(name).then((result) => {
         updateSearchValue(result.name);
         setSuggestions([]);
         setShowCreateOption(false);
@@ -75,7 +74,9 @@ function BBAutocomplete<T extends BBSearchable>({
     setShowCreateOption(false);
   }
 
-  function populateSuggestionsFromSearchValue(event: React.ChangeEvent<HTMLInputElement>) {
+  function populateSuggestionsFromSearchValue(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) {
     let newSearchValue = event.target.value;
     updateSearchValue(newSearchValue);
 
@@ -86,15 +87,19 @@ function BBAutocomplete<T extends BBSearchable>({
       return;
     }
 
-    suggestionsFunction(newSearchValue).then(({suggestionsResult, hasExactMatch})=>{
-      setSuggestions(suggestionsResult);
-      setShowCreateOption(!hasExactMatch);
-    });
+    suggestionsFunction(newSearchValue).then(
+      ({ suggestionsResult, hasExactMatch }) => {
+        setSuggestions(suggestionsResult);
+        setShowCreateOption(!hasExactMatch);
+      },
+    );
   }
 
-  function populateSuggestionsFromSelected(event: React.FocusEvent<HTMLInputElement>) {
-    if(selected){
-      suggestionsFunction(selected.name).then(({suggestionsResult})=>{
+  function populateSuggestionsFromSelected(
+    event: React.FocusEvent<HTMLInputElement>,
+  ) {
+    if (selected) {
+      suggestionsFunction(selected.name).then(({ suggestionsResult }) => {
         setSuggestions(suggestionsResult);
         setShowCreateOption(false);
       });
@@ -107,10 +112,12 @@ function BBAutocomplete<T extends BBSearchable>({
         <button
           disabled={searchValue === ""}
           onMouseDown={handleSearchClear}
-          className={"absolute right-1 top-2 z-10 opacity-40 hover:opacity-100 " 
-            + (searchValue === ""
-            ? "invisible"
-            : "invisible group-focus-within:visible")}
+          className={
+            "absolute top-2 right-1 z-10 opacity-40 hover:opacity-100 " +
+            (searchValue === ""
+              ? "invisible"
+              : "invisible group-focus-within:visible")
+          }
         >
           <CircleX />
         </button>
@@ -123,7 +130,7 @@ function BBAutocomplete<T extends BBSearchable>({
           onChange={populateSuggestionsFromSearchValue}
           onFocus={populateSuggestionsFromSelected}
           onBlur={resetNoSelected}
-          className={"border w-full py-1 pl-2 pr-7 truncate rounded-sm"}
+          className={"w-full truncate rounded-sm border py-1 pr-7 pl-2"}
         />
       </div>
 
@@ -138,24 +145,24 @@ function BBAutocomplete<T extends BBSearchable>({
               <section>
                 <span className="text-xl">{suggestion.name}</span>
               </section>
-              {suggestionsDetails ? 
-                <section className="text-xs indent-2">
+              {suggestionsDetails ? (
+                <section className="indent-2 text-xs">
                   {suggestionsDetails(suggestion)}
-                </section> 
-              : null}
+                </section>
+              ) : null}
             </li>
           );
         })}
 
         {showCreateOption ? (
           <li
-            className="px-1" 
-            onMouseDown={() => handleCreateNewOption(searchValue)}>
+            className="px-1"
+            onMouseDown={() => handleCreateNewOption(searchValue)}
+          >
             {'Add New "' + searchValue + '"'}
           </li>
         ) : null}
       </ul>
-
     </div>
   );
 }

@@ -3,26 +3,26 @@ import { BasketItem, ShopItem } from "../data/models";
 import BBItemSearch from "./BBItemSearch";
 
 //Main component? has search and list
-function BBBasket() { // WHAT COMPONENT WILL OWN THE ADD BUTTON
+function BBBasket() {
+  // WHAT COMPONENT WILL OWN THE ADD BUTTON
   let [basketItems, setBasketItem] = useState<BasketItem[]>([]);
   let [itemToAdd, setItemToAdd] = useState<BasketItem>(); // maybe ref?
 
-  function addBasketItem(){
-    if(itemToAdd){
+  function addBasketItem() {
+    if (itemToAdd) {
       //generate new Id for this, should be allowed to put multiple instances of the item
-      setBasketItem((prevBasketItems)=>([...prevBasketItems, itemToAdd]));
+      setBasketItem((prevBasketItems) => [...prevBasketItems, itemToAdd]);
     }
   }
 
-  function handleAddBySearch(searchedItem: ShopItem | undefined){
+  function handleAddBySearch(searchedItem: ShopItem | undefined) {
     let newBasketItem = searchedItem as BasketItem;
-    
+
     setItemToAdd(newBasketItem);
   }
 
   function handleSearchByQR() {
     // search item match for QR code, then fill selectedItem with details, (could add checkbox for auto add in list if a Shop is selected)
-
     //setItemToAdd(newBasketItem);
   }
 
@@ -30,11 +30,7 @@ function BBBasket() { // WHAT COMPONENT WILL OWN THE ADD BUTTON
     <div className="bg-green-900">
       <div>
         <BBItemSearch onSearchDone={handleAddBySearch} />
-        <button 
-          type="button"
-          className="bg-red-200" 
-          onClick={addBasketItem}
-        >
+        <button type="button" className="bg-red-200" onClick={addBasketItem}>
           Add user Searched Item
         </button>
         <button onClick={handleSearchByQR}>Add using QR button</button>
@@ -43,18 +39,15 @@ function BBBasket() { // WHAT COMPONENT WILL OWN THE ADD BUTTON
       <div>
         <div>{itemToAdd?.name}</div>
         <ul>
-          {
-            basketItems.map((item)=>{
-              return(
-                <li key={item.id}>{item.name}</li>
-              );
-            })
-          }
+          {basketItems.map((item) => {
+            return <li key={item.id}>{item.name}</li>;
+          })}
         </ul>
         <div>
           Top section: Just a sortable completable deletable list items checked
           are sorted at the bottom has Done Grabbing/Go Pay button where checked
-          items are removed from the basket and moved to a different "bought list"
+          items are removed from the basket and moved to a different "bought
+          list"
         </div>
       </div>
 

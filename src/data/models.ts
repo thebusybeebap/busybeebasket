@@ -3,7 +3,7 @@ import { v7 as uuidv7 } from "uuid";
 
 import { BBSearchable } from "../components/BBAutocomplete";
 
-export function generateId(){
+export function generateId() {
   return uuidv7();
 }
 

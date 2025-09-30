@@ -9,24 +9,29 @@ import ShopItemDetails from "../components/ShopItemDetails";
 import { ScanBarcode, SquarePlus } from "lucide-react";
 
 function BBItemSearch({
-  onSearchDone
-}:{
-  onSearchDone: (searchedItem: ShopItem | undefined)=>void
+  onSearchDone,
+}: {
+  onSearchDone: (searchedItem: ShopItem | undefined) => void;
 }) {
   let [selectedShop, setSelectedShop] = useState<Shop>();
-  let {fetchShopsByNameQuery, createShop, isShopLoading} = useShop();
+  let { fetchShopsByNameQuery, createShop, isShopLoading } = useShop();
   let [shopSearchValue, setShopSearchValue] = useState("");
 
   let [selectedItem, setSelectedItem] = useState<ShopItem>();
-  let { fetchItemsInShopByNameQuery, fetchItemsInAllShopsByNameQuery, createShopItem, isShopItemLoading} = useShopItem();
+  let {
+    fetchItemsInShopByNameQuery,
+    fetchItemsInAllShopsByNameQuery,
+    createShopItem,
+    isShopItemLoading,
+  } = useShopItem();
   let [itemSearchValue, setItemSearchValue] = useState("");
 
   //SHOP
   function handleShopSelect(shop?: Shop) {
     if (shop) {
       setSelectedShop(shop);
-      if(selectedItem){
-        if(selectedItem.shopId !== shop.id){
+      if (selectedItem) {
+        if (selectedItem.shopId !== shop.id) {
           setSelectedItem(undefined);
           setItemSearchValue("");
         }
@@ -36,7 +41,7 @@ function BBItemSearch({
     }
   }
 
-  async function handleCreateNewShop<Shop>(name: string){
+  async function handleCreateNewShop<Shop>(name: string) {
     //TODO: add error handling
     let newShop = await createShop(name);
 
@@ -52,14 +57,12 @@ function BBItemSearch({
   async function getShopSuggestions(searchQuery: string) {
     let shops: Shop[] = [];
     let hasExactMatch = false;
-    try{
-      ({shops, hasExactMatch} = await fetchShopsByNameQuery(searchQuery)); //is enclosing in () the best to do here?
-    }
-    catch(error){
+    try {
+      ({ shops, hasExactMatch } = await fetchShopsByNameQuery(searchQuery)); //is enclosing in () the best to do here?
+    } catch (error) {
       console.error("Failed to fetch Shops:", error);
-    }
-    finally{
-      return({suggestionsResult: shops, hasExactMatch});
+    } finally {
+      return { suggestionsResult: shops, hasExactMatch };
     }
   }
 
@@ -69,12 +72,14 @@ function BBItemSearch({
     if (item) {
       setSelectedItem(item);
       onSearchDone(item);
-      
-      if(!selectedShop && item.shopName !== "NONE"){ // TODO REFACTOR "NONE" handling
-        let shopFromSelectedItem = { //find better way of doing this
+
+      if (!selectedShop && item.shopName !== "NONE") {
+        // TODO REFACTOR "NONE" handling
+        let shopFromSelectedItem = {
+          //find better way of doing this
           id: item.shopId,
-          name: item.shopName
-        }
+          name: item.shopName,
+        };
         setSelectedShop(shopFromSelectedItem);
         setShopSearchValue(shopFromSelectedItem.name); // do this for shop select also, clear item if item is not in selected shop
         // search value on autocomplete component
@@ -86,17 +91,15 @@ function BBItemSearch({
   }
 
   async function handleCreateNewItem<ShopItem>(name: string) {
-    
     let newShopItem;
-    
+
     let shopId = selectedShop?.id;
-    try{
-      newShopItem = await createShopItem({shopId: shopId, newItemName: name});
-    }
-    catch(error){
+    try {
+      newShopItem = await createShopItem({ shopId: shopId, newItemName: name });
+    } catch (error) {
       console.error("Failed to Create New Shop Item:", error);
     }
-        
+
     setSelectedItem(newShopItem);
     onSearchDone(newShopItem);
     return newShopItem as ShopItem;
@@ -106,28 +109,29 @@ function BBItemSearch({
     let shopItems: ShopItem[] = []; // TODO: refactor useShopItems function to not return undefined
     let hasExactMatch = false;
 
-    if(selectedShop){
-      try{
-        ({shopItems, hasExactMatch} = await fetchItemsInShopByNameQuery(selectedShop.id, searchQuery));
+    if (selectedShop) {
+      try {
+        ({ shopItems, hasExactMatch } = await fetchItemsInShopByNameQuery(
+          selectedShop.id,
+          searchQuery,
+        ));
+      } catch (error) {
+        console.error("Failed to fetch shop items:", error);
       }
-      catch(error){
+    } else {
+      try {
+        ({ shopItems, hasExactMatch } =
+          await fetchItemsInAllShopsByNameQuery(searchQuery));
+      } catch (error) {
         console.error("Failed to fetch shop items:", error);
       }
     }
-    else{
-      try{
-        ({shopItems, hasExactMatch} = await fetchItemsInAllShopsByNameQuery(searchQuery));
-      }
-      catch(error){
-        console.error("Failed to fetch shop items:", error);
-      }
-    }
-    return({suggestionsResult: shopItems, hasExactMatch});
+    return { suggestionsResult: shopItems, hasExactMatch };
   }
 
   return (
-    <div className="w-99/100 bg-blue-900 flex flex-col gap-2">
-      <div className="border-2 border-solid flex-1 p-1">
+    <div className="flex w-99/100 flex-col gap-2 bg-blue-900">
+      <div className="flex-1 border-2 border-solid p-1">
         <BBAutocomplete<Shop>
           suggestionsFunction={getShopSuggestions}
           selected={selectedShop}
@@ -138,7 +142,7 @@ function BBItemSearch({
           updateSearchValue={setShopSearchValue}
         />
       </div>
-      <div className="w-full flex gap-2 border-2 border-solid p-1 flex-1">
+      <div className="flex w-full flex-1 gap-2 border-2 border-solid p-1">
         <BBAutocomplete<ShopItem>
           suggestionsFunction={getItemsSuggestions}
           selected={selectedItem}
@@ -147,7 +151,7 @@ function BBItemSearch({
           placeHolder="Search Item"
           searchValue={itemSearchValue}
           updateSearchValue={setItemSearchValue}
-          suggestionsDetails={(item)=>ShopItemDetails(item, !selectedShop)}
+          suggestionsDetails={(item) => ShopItemDetails(item, !selectedShop)}
         />
         <button>
           <SquarePlus />

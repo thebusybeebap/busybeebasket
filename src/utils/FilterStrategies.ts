@@ -1,17 +1,16 @@
-export namespace FilterStrategies{
-
-  export interface WithNameProperty{
+export namespace FilterStrategies {
+  export interface WithNameProperty {
     name: string;
   }
 
-  export interface WithItemIdProperty{
+  export interface WithItemIdProperty {
     itemId: string;
   }
 
-  export interface WithShopIdProperty{
+  export interface WithShopIdProperty {
     shopId: string;
   }
-/*
+  /*
   type matchFunction = () => boolean;
 
   export function queryMatchesName(){
@@ -22,20 +21,32 @@ export namespace FilterStrategies{
     
   }*/
 
-  export function filterByName<T extends WithNameProperty>(element: T, query: string){
-    return element.name.trim().toLowerCase().includes(query.trim().toLowerCase());
+  export function filterByName<T extends WithNameProperty>(
+    element: T,
+    query: string,
+  ) {
+    return element.name
+      .trim()
+      .toLowerCase()
+      .includes(query.trim().toLowerCase());
   }
 
-  export function filterByIdInSet<T extends WithItemIdProperty>(element: T, setRef: Set<string>){
-    return setRef.has(element.itemId)
+  export function filterByIdInSet<T extends WithItemIdProperty>(
+    element: T,
+    setRef: Set<string>,
+  ) {
+    return setRef.has(element.itemId);
   }
 
-  export function matchesShopId<T extends WithShopIdProperty>(element: T, id: string){
+  export function matchesShopId<T extends WithShopIdProperty>(
+    element: T,
+    id: string,
+  ) {
     //when calling, if no provided id, default to "NONE" shop id.
     return element.shopId === id;
   }
 
-/*
+  /*
   export function hasExactMatchInList<T>(list: T[], matchingConditions: matchFunction[]){
     let isSearchValueExactMatch = suggestionsResult.some(
       (element) => element.name.trim().toLowerCase() === newSearchValue.trim().toLowerCase()
