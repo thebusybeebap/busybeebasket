@@ -12,6 +12,7 @@ import { PersistShops } from "../services/Shops";
 import { PersistItems } from "../services/Items";
 import { PersistShopItems } from "../services/ShopItems";
 import { PagingStrategies } from "../utils/PagingStrategies";
+import { matchedSortValue, shopItemMatchedSortValue } from "../utils/Utilities";
 
 const PAGE_SIZE = 10;
 
@@ -146,6 +147,7 @@ function useShopItem() {
         );
         if (result.length === 0) return { emptyArray, hasExactMatch };
 
+        result.sort((a, b) => a.name.localeCompare(b.name));
         // exactMatch is set regardless if matched item is part of page
         let noneShop = await PersistShops.getNoneShop();
         if (noneShop) {
@@ -157,6 +159,22 @@ function useShopItem() {
                 nameQuery.trim().toLowerCase()
             );
           });
+
+          if (hasExactMatch) {
+            result.sort(
+              (a, b) =>
+                shopItemMatchedSortValue(a, nameQuery, noneShop.id) -
+                shopItemMatchedSortValue(b, nameQuery, noneShop.id),
+            );
+          }
+        } else {
+          if (hasExactMatch) {
+            result.sort(
+              (a, b) =>
+                matchedSortValue(a.name, nameQuery) -
+                matchedSortValue(b.name, nameQuery),
+            );
+          }
         }
 
         let { start, end } = PagingStrategies.pageIndices(0, result.length);

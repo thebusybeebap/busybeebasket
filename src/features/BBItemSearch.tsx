@@ -9,9 +9,11 @@ import ShopItemDetails from "../components/ShopItemDetails";
 import { ScanBarcode, SquarePlus } from "lucide-react";
 
 function BBItemSearch({
-  onSearchDone,
+  //onSearchDone, // to be removed and calls below
+  onAddAction,
 }: {
-  onSearchDone: (searchedItem: ShopItem | undefined) => void;
+  //onSearchDone: (searchedItem: ShopItem | undefined) => void;
+  onAddAction: (searchedItem: ShopItem) => void; // could completely remove onSearchDone, and just pass selected Item here
 }) {
   let [selectedShop, setSelectedShop] = useState<Shop>();
   let { fetchShopsByNameQuery, createShop, isShopLoading } = useShop();
@@ -26,14 +28,22 @@ function BBItemSearch({
   } = useShopItem();
   let [itemSearchValue, setItemSearchValue] = useState("");
 
+  function handleAddAction() {
+    if (selectedItem) {
+      onAddAction(selectedItem);
+    }
+  }
+
   //SHOP
   function handleShopSelect(shop?: Shop) {
     if (shop) {
       setSelectedShop(shop);
       if (selectedItem) {
         if (selectedItem.shopId !== shop.id) {
+          // create a function that updates all selectedItem related
           setSelectedItem(undefined);
           setItemSearchValue("");
+          //onSearchDone(undefined);
         }
       }
     } else {
@@ -50,6 +60,7 @@ function BBItemSearch({
     //new shop has no items yet
     setSelectedItem(undefined); //why does this not triger rerender for item input?
     setItemSearchValue(""); //why does this not triger rerender for item input?
+    //onSearchDone(undefined);
 
     return newShop as Shop;
   }
@@ -71,7 +82,7 @@ function BBItemSearch({
     //TODO: to filter Shop selections when an item is selected, based if item is in Shop
     if (item) {
       setSelectedItem(item);
-      onSearchDone(item);
+      //onSearchDone(item);
 
       if (!selectedShop && item.shopName !== "NONE") {
         // TODO REFACTOR "NONE" handling
@@ -86,7 +97,7 @@ function BBItemSearch({
       }
     } else {
       setSelectedItem(undefined); //when does this happen?? when is the selectedItem state cleared? check
-      onSearchDone(undefined);
+      //onSearchDone(undefined);
     }
   }
 
@@ -101,7 +112,7 @@ function BBItemSearch({
     }
 
     setSelectedItem(newShopItem);
-    onSearchDone(newShopItem);
+    //onSearchDone(newShopItem);
     return newShopItem as ShopItem;
   }
 
@@ -129,9 +140,14 @@ function BBItemSearch({
     return { suggestionsResult: shopItems, hasExactMatch };
   }
 
+  function handleSearchByQR() {
+    // search item match for QR code, then fill selectedItem with details, (could add checkbox for auto add in list if a Shop is selected)
+    //setItemToAdd(newBasketItem);
+  }
+
   return (
-    <div className="flex w-99/100 flex-col gap-2 bg-blue-900">
-      <div className="flex-1 border-2 border-solid p-1">
+    <div className="flex flex-col gap-2 bg-blue-900">
+      <div className="flex-1 p-1">
         <BBAutocomplete<Shop>
           suggestionsFunction={getShopSuggestions}
           selected={selectedShop}
@@ -151,13 +167,19 @@ function BBItemSearch({
           placeHolder="Search Item"
           searchValue={itemSearchValue}
           updateSearchValue={setItemSearchValue}
-          suggestionsDetails={(item) => ShopItemDetails(item, !selectedShop)}
+          suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
         />
         <button>
-          <SquarePlus />
+          <SquarePlus onClick={handleAddAction} />
         </button>
         <button>
-          <ScanBarcode />
+          <ScanBarcode
+            onClick={() =>
+              console.log(
+                "to implement, function that searches persist layer and then fill the search input boxes.NOT auto add to list, still need to click +",
+              )
+            }
+          />
         </button>
       </div>
     </div>

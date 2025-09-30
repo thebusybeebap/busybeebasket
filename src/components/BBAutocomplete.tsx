@@ -108,12 +108,12 @@ function BBAutocomplete<T extends BBSearchable>({
 
   return (
     <div className="relative w-full">
-      <div className="group w-full text-xl">
+      <div className="group relative w-full text-xl">
         <button
           disabled={searchValue === ""}
           onMouseDown={handleSearchClear}
           className={
-            "absolute top-2 right-1 z-10 opacity-40 hover:opacity-100 " +
+            "absolute top-1/2 right-1 -translate-y-1/2 transform opacity-40 hover:opacity-100 " +
             (searchValue === ""
               ? "invisible"
               : "invisible group-focus-within:visible")
@@ -130,7 +130,9 @@ function BBAutocomplete<T extends BBSearchable>({
           onChange={populateSuggestionsFromSearchValue}
           onFocus={populateSuggestionsFromSelected}
           onBlur={resetNoSelected}
-          className={"w-full truncate rounded-sm border py-1 pr-7 pl-2"}
+          className={
+            "w-full truncate rounded-sm border border-2 py-1 pr-7 pl-2"
+          }
         />
       </div>
 
@@ -138,7 +140,10 @@ function BBAutocomplete<T extends BBSearchable>({
         {suggestions.map((suggestion) => {
           return (
             <li
-              className="bg-amber-300 px-1"
+              className={
+                "px-2 py-2 " +
+                (searchValue === suggestion.name ? "bg-amber-300" : "bg-white")
+              }
               onMouseDown={() => handleSelect(suggestion)}
               key={suggestion.id}
             >
@@ -156,10 +161,10 @@ function BBAutocomplete<T extends BBSearchable>({
 
         {showCreateOption ? (
           <li
-            className="px-1"
+            className="px-2 py-2"
             onMouseDown={() => handleCreateNewOption(searchValue)}
           >
-            {'Add New "' + searchValue + '"'}
+            <span className="text-xl">{'Add New "' + searchValue + '"'}</span>
           </li>
         ) : null}
       </ul>

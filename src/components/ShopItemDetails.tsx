@@ -1,10 +1,20 @@
-import { ShopItem } from "../data/models";
+import { Shop, ShopItem } from "../data/models";
 
-function ShopItemDetails(item: ShopItem, showShopName: boolean) {
+function ShopItemDetails(
+  item: ShopItem,
+  //showShopName: boolean,
+  selectedShop?: Shop,
+) {
   return (
     <>
-      {showShopName && item.shopName ? (
-        <span>{"Store: " + item.shopName}</span>
+      {selectedShop && item.shopName ? (
+        <span
+          className={
+            selectedShop.id === item.shopId ? "bg-amber-900" : "bg-current"
+          }
+        >
+          {"Store: " + item.shopName}
+        </span>
       ) : null}
       {item.price ? <span>{"Price: " + item.price}</span> : null}
     </>

@@ -3,6 +3,7 @@ import bbbdb, { generateId, ShopPersistStorage } from "../services/bbddb";
 import { Shop } from "../data/models";
 import { PersistShops } from "../services/Shops";
 import { PagingStrategies } from "../utils/PagingStrategies";
+import { cleanString, matchedSortValue } from "../utils/Utilities";
 
 function useShop() {
   let [isShopLoading, setIsShopLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time
@@ -10,8 +11,17 @@ function useShop() {
   async function fetchShopsByNameQuery(nameQuery: string) {
     setIsShopLoading(true);
     let result = await PersistShops.fetchShopsByNameQuery(nameQuery);
+
+    result.sort((a, b) => a.name.localeCompare(b.name));
     let shopNames = new Set(result.map((shop) => shop.name));
     let hasExactMatch = shopNames.has(nameQuery);
+    if (hasExactMatch) {
+      result.sort(
+        (a, b) =>
+          matchedSortValue(a.name, nameQuery) -
+          matchedSortValue(b.name, nameQuery),
+      );
+    }
 
     let { start, end } = PagingStrategies.pageIndices(0, result.length);
     let shops = result.slice(start, end);
