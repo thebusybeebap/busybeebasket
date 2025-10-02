@@ -14,7 +14,7 @@ export interface BasketItem {
   price?: number;
   shopId: string; //key
   shopName: string;
-  //status
+  isCompleted: boolean; //status
 }
 
 export interface Shop extends BBSearchable {

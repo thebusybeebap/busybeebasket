@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { BasketItem, ShopItem } from "../data/models";
+import { generateId, ShopItem } from "../data/models";
 import BBItemSearch from "./BBItemSearch";
+import useBBList from "../components/BBList/useBBList";
+import BBList from "../components/BBList/BBList";
 
 function BBBasket() {
-  let [basketItems, setBasketItem] = useState<BasketItem[]>([]);
+  let { basket, addItem, removeItem, checkItem, fillBasket, moveItem } =
+    useBBList(); //TODO: rename/refactor to useBasket
 
   function handleAddItemToBasket(itemToAdd: ShopItem) {
     if (itemToAdd) {
-      //generate new Id for this, should be allowed to put multiple instances of the item
-      setBasketItem((prevBasketItems) => [...prevBasketItems, itemToAdd]);
+      let itemBasketId = generateId();
+      addItem({ ...itemToAdd, id: itemBasketId, isCompleted: false });
     }
   }
 
@@ -21,15 +23,39 @@ function BBBasket() {
       </div>
 
       <div className="flex-grow-1 overflow-x-hidden overflow-y-auto bg-teal-300">
-        Scrollable area, items are draggable in y axis, fixed height overflow
-        scroll
+        <BBList
+          basket={basket}
+          removeItem={removeItem}
+          checkItem={checkItem}
+          moveItem={moveItem}
+        />
+      </div>
+
+      <div className="mt-auto bg-orange-600">
         <ul>
-          {basketItems.map((item) => {
+          <li>
+            Component - non-draggable, readonly, deletable, with action
+            button(add/update price, add/update barcode)
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+export default BBBasket;
+
+/*
+
+        Scrollable area, items are draggable in y axis, fixed height overflow
+        scroll, Items - Completable, handle draggable, deletable, action
+        button(add/update price/barcode)
+        <ul>
+          {basket.map((item) => {
             return <li key={item.id}>{item.name}</li>;
           })}
         </ul>
         <ul className="flex px-1 py-2">
-          {basketItems.map((item) => {
+          {basket.map((item) => {
             return (
               <li className="line-through" key={item.id}>
                 {item.name}
@@ -37,12 +63,4 @@ function BBBasket() {
             );
           })}
         </ul>
-      </div>
-
-      <div className="mt-auto bg-orange-600">
-        Expand Bought Section should stick to bottom
-      </div>
-    </div>
-  );
-}
-export default BBBasket;
+*/

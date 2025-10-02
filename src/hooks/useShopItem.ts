@@ -147,6 +147,9 @@ function useShopItem() {
         );
         if (result.length === 0) return { emptyArray, hasExactMatch };
 
+        //BUG: searching item existing in another store, when a different store is selected does not show create new option(observed in items existing in "NONE shop")
+        //BUG: steps: create a shop, create an item in shop, unselect the shop, then search created item, suggestions should show the created Item AND a create new option since item for "NONE" shop is not created yet(currently not showing)
+
         result.sort((a, b) => a.name.localeCompare(b.name));
         // exactMatch is set regardless if matched item is part of page
         let noneShop = await PersistShops.getNoneShop();
