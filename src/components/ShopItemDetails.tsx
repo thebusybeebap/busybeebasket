@@ -1,5 +1,7 @@
 import { Shop, ShopItem } from "../data/models";
 
+//BUG: shop name showing when there is selected shop and not showing when there is no selected shop. should be the other way around
+
 function ShopItemDetails(
   item: ShopItem,
   //showShopName: boolean,

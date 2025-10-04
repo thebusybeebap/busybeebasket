@@ -43,24 +43,3 @@ function BBBasket() {
   );
 }
 export default BBBasket;
-
-/*
-
-        Scrollable area, items are draggable in y axis, fixed height overflow
-        scroll, Items - Completable, handle draggable, deletable, action
-        button(add/update price/barcode)
-        <ul>
-          {basket.map((item) => {
-            return <li key={item.id}>{item.name}</li>;
-          })}
-        </ul>
-        <ul className="flex px-1 py-2">
-          {basket.map((item) => {
-            return (
-              <li className="line-through" key={item.id}>
-                {item.name}
-              </li>
-            );
-          })}
-        </ul>
-*/

@@ -9,11 +9,9 @@ import ShopItemDetails from "../components/ShopItemDetails";
 import { ScanBarcode, SquarePlus } from "lucide-react";
 
 function BBItemSearch({
-  //onSearchDone, // to be removed and calls below
   onAddAction,
 }: {
-  //onSearchDone: (searchedItem: ShopItem | undefined) => void;
-  onAddAction: (searchedItem: ShopItem) => void; // could completely remove onSearchDone, and just pass selected Item here
+  onAddAction: (searchedItem: ShopItem) => void;
 }) {
   let [selectedShop, setSelectedShop] = useState<Shop>();
   let { fetchShopsByNameQuery, createShop, isShopLoading } = useShop();
@@ -60,7 +58,6 @@ function BBItemSearch({
     //new shop has no items yet
     setSelectedItem(undefined); //why does this not triger rerender for item input?
     setItemSearchValue(""); //why does this not triger rerender for item input?
-    //onSearchDone(undefined);
 
     return newShop as Shop;
   }
@@ -82,7 +79,6 @@ function BBItemSearch({
     //TODO: to filter Shop selections when an item is selected, based if item is in Shop
     if (item) {
       setSelectedItem(item);
-      //onSearchDone(item);
 
       if (!selectedShop && item.shopName !== "NONE") {
         // TODO REFACTOR "NONE" handling
@@ -97,7 +93,6 @@ function BBItemSearch({
       }
     } else {
       setSelectedItem(undefined); //when does this happen?? when is the selectedItem state cleared? check
-      //onSearchDone(undefined);
     }
   }
 
@@ -112,7 +107,6 @@ function BBItemSearch({
     }
 
     setSelectedItem(newShopItem);
-    //onSearchDone(newShopItem);
     return newShopItem as ShopItem;
   }
 

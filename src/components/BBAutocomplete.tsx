@@ -40,14 +40,21 @@ function BBAutocomplete<T extends BBSearchable>({
   let [showCreateOption, setShowCreateOption] = useState(false);
   let searchInputRef = useRef<HTMLInputElement>(null);
 
-  function handleSelect(selected: T) {
+  function handleSelect(event: React.MouseEvent<HTMLLIElement>, selected: T) {
+    event.preventDefault();
+    event.stopPropagation();
     onSelect(selected);
     updateSearchValue(selected.name);
     setSuggestions([]);
     setShowCreateOption(false);
   }
 
-  function handleCreateNewOption(name: string) {
+  function handleCreateNewOption(
+    event: React.MouseEvent<HTMLLIElement>,
+    name: string,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
     if (typeof onCreateNew === "function") {
       onCreateNew(name).then((result) => {
         updateSearchValue(result.name);
@@ -99,10 +106,12 @@ function BBAutocomplete<T extends BBSearchable>({
     event: React.FocusEvent<HTMLInputElement>,
   ) {
     if (selected) {
-      suggestionsFunction(selected.name).then(({ suggestionsResult }) => {
-        setSuggestions(suggestionsResult);
-        setShowCreateOption(false);
-      });
+      suggestionsFunction(selected.name).then(
+        ({ suggestionsResult, hasExactMatch }) => {
+          setSuggestions(suggestionsResult);
+          setShowCreateOption(!hasExactMatch);
+        },
+      );
     }
   }
 
@@ -111,7 +120,7 @@ function BBAutocomplete<T extends BBSearchable>({
       <div className="group relative w-full text-xl">
         <button
           disabled={searchValue === ""}
-          onMouseDown={handleSearchClear}
+          onMouseDownCapture={handleSearchClear}
           className={
             "absolute top-1/2 right-1 -translate-y-1/2 transform opacity-40 hover:opacity-100 " +
             (searchValue === ""
@@ -130,9 +139,7 @@ function BBAutocomplete<T extends BBSearchable>({
           onChange={populateSuggestionsFromSearchValue}
           onFocus={populateSuggestionsFromSelected}
           onBlur={resetNoSelected}
-          className={
-            "w-full truncate rounded-sm border border-2 py-1 pr-7 pl-2"
-          }
+          className={"w-full truncate rounded-sm border-2 py-1 pr-7 pl-2"}
         />
       </div>
 
@@ -144,7 +151,7 @@ function BBAutocomplete<T extends BBSearchable>({
                 "px-2 py-2 " +
                 (searchValue === suggestion.name ? "bg-amber-300" : "bg-white")
               }
-              onMouseDown={() => handleSelect(suggestion)}
+              onMouseDownCapture={(event) => handleSelect(event, suggestion)}
               key={suggestion.id}
             >
               <section>
@@ -162,7 +169,9 @@ function BBAutocomplete<T extends BBSearchable>({
         {showCreateOption ? (
           <li
             className="px-2 py-2"
-            onMouseDown={() => handleCreateNewOption(searchValue)}
+            onMouseDownCapture={(event) =>
+              handleCreateNewOption(event, searchValue)
+            }
           >
             <span className="text-xl">{'Add New "' + searchValue + '"'}</span>
           </li>
