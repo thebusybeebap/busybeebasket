@@ -154,7 +154,7 @@ function BBItemSearch({
           updateSearchValue={setShopSearchValue}
         />
       </div>
-      <div className="flex w-full flex-1 gap-2 border-2 border-solid p-1">
+      <div className="flex w-full flex-1 gap-2 border-2 border-solid p-1 pr-2">
         <BBAutocomplete<ShopItem>
           suggestionsFunction={getItemsSuggestions}
           selected={selectedItem}
@@ -166,15 +166,10 @@ function BBItemSearch({
           suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
         />
         <button>
-          <SquarePlus onClick={handleAddAction} />
-        </button>
-        <button>
-          <ScanBarcode
-            onClick={() =>
-              console.log(
-                "to implement, function that searches persist layer and then fill the search input boxes.NOT auto add to list, still need to click +",
-              )
-            }
+          <SquarePlus
+            className="rounded-md bg-gray-600 px-1"
+            size={32}
+            onClick={handleAddAction}
           />
         </button>
       </div>
@@ -183,3 +178,15 @@ function BBItemSearch({
 }
 
 export default BBItemSearch;
+
+/**BARCODE
+<button>
+  <ScanBarcode
+    onClick={() =>
+      console.log(
+        "to implement, function that searches persist layer and then fill the search input boxes.NOT auto add to list, still need to click +",
+      )
+    }
+  />
+</button>
+ */

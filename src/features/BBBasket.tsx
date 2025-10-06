@@ -4,6 +4,7 @@ import BBList from "../components/BBList/BBList";
 import { useState } from "react";
 import { BASKET_ITEM_STATUS } from "../services/bbddb";
 import useBasketItem from "../hooks/useBasketItem";
+import { ShoppingBasket, ShoppingCart, Trash, Trash2 } from "lucide-react";
 
 function BBBasket() {
   let {
@@ -44,10 +45,30 @@ function BBBasket() {
     itemReorder(reOrderedItems);
   }
 
-  return (
-    <div className="flex h-full flex-col bg-green-900">
-      <div className="h-4 bg-green-400"></div>
+  function handleDonePicking() {
+    setIsPicking((isPicking) => !isPicking);
+    bagPickedItems();
+  }
 
+  function handleRemoveUnpicked() {
+    deleteUnpickedItems();
+  }
+
+  function handleEmptyBasket() {
+    emptyBasket();
+  }
+
+  function handleEmptyBag() {
+    setIsPicking((isPicking) => !isPicking);
+    deleteBaggedItems();
+  }
+
+  function handlePickMore() {
+    setIsPicking((isPicking) => !isPicking);
+  }
+
+  return (
+    <div className="flex h-full flex-col bg-green-900 py-4">
       <div className="flex-grow-0">
         <BBItemSearch onAddAction={handleAddItem} />
       </div>
@@ -62,27 +83,64 @@ function BBBasket() {
             />
           </div>
 
-          <div className="mt-auto bg-orange-600">
-            <button>Empty Basket - all items</button>
-            <button>Remove Unpicked - delete unchecked</button>
-            <button onClick={() => setIsPicking((isPicking) => !isPicking)}>
-              Done Picking - move checked to Bought - opens Picked Items
+          <div className="mt-auto flex gap-2 bg-orange-600">
+            <button
+              className="flex-1 rounded-md border-1 bg-red-800"
+              onClick={handleEmptyBasket}
+            >
+              <Trash2 />
+              Empty Basket
+            </button>
+            <button
+              className="flex-1 rounded-md border-1 bg-orange-800"
+              onClick={handleRemoveUnpicked}
+            >
+              <Trash />
+              Remove Unpicked
+            </button>
+            <button
+              className="flex-1 rounded-md border-1 bg-green-800"
+              onClick={handleDonePicking}
+            >
+              <ShoppingCart />
+              Done Picking
             </button>
           </div>
         </>
       ) : null}
-      <div className={"bg-gray-600 " + (isPicking ? "mt-auto" : "flex-grow-1")}>
-        <button>Pick More Items</button>
-        {/*isPicking ? null : (
+      {isPicking ? null : (
+        <div
+          className={
+            "flex h-full flex-col bg-gray-600 " +
+            (isPicking ? "mt-auto" : "flex-grow-1")
+          }
+        >
           <ul className="w-full">
-            {basket?.map((item: BasketItem) =>
+            {liveBasket.map((item: BasketItem) =>
               item.status === BASKET_ITEM_STATUS.BAGGED ? (
                 <li>{item.name}</li>
               ) : null,
             )}
           </ul>
-        )*/}
-      </div>
+
+          <div className="mt-auto flex gap-2 bg-orange-600">
+            <button
+              className="flex-1 rounded-md border-1 bg-red-800"
+              onClick={handleEmptyBag}
+            >
+              <Trash2 />
+              Empty Bag
+            </button>
+            <button
+              className="flex-1 rounded-md border-1 bg-blue-800"
+              onClick={handlePickMore}
+            >
+              <ShoppingBasket />
+              Pick More Items
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

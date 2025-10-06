@@ -22,6 +22,7 @@ export interface ShopPersistStorage {
 export interface ItemPersistStorage {
   id: string;
   name: string;
+  barcode?: string;
   updatedAt: Date;
 }
 
@@ -54,7 +55,7 @@ const bbbdb = new Dexie("BBBasketDB") as Dexie & {
 
 bbbdb.version(1).stores({
   shops: "&id, &name, updatedAt",
-  items: "&id, &name, updatedAt",
+  items: "&id, &name, &barcode, updatedAt",
   shopItems: "&[shopId+itemId], shopId, itemId, updatedAt",
   basketItems: "&id, status, position",
 });
