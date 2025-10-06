@@ -8,6 +8,8 @@ import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import { ScanBarcode, SquarePlus } from "lucide-react";
 
+//TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
+
 function BBItemSearch({
   onAddAction,
 }: {

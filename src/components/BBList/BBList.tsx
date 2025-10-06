@@ -8,6 +8,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
+  arrayMove,
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -17,18 +18,21 @@ import {
 } from "@dnd-kit/modifiers";
 import { BasketItem } from "../../data/models";
 import BBItem from "./BBItem";
+import { BASKET_ITEM_STATUS } from "../../services/bbddb";
+import { useEffect, useState } from "react";
 
 function BBList({
-  basket,
+  liveBasket,
   removeItem,
   checkItem,
-  moveItem,
+  reOrderItems,
 }: {
-  basket: BasketItem[];
+  liveBasket: BasketItem[];
   removeItem: (id: string) => void;
   checkItem: (id: string) => void;
-  moveItem: (oldIndex: number, newIndex: number) => void;
+  reOrderItems: (reOrderedItems: BasketItem[]) => void;
 }) {
+  let [basket, setBasket] = useState([] as BasketItem[]);
   let sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   function handleTaskDelete(id: string) {
@@ -49,9 +53,17 @@ function BBList({
       const newIndex = basket.findIndex(
         (item: BasketItem) => item.id === over?.id,
       );
-      moveItem(oldIndex, newIndex);
+      setBasket((prevBasket) => {
+        let reOrderedItems = arrayMove(prevBasket, oldIndex, newIndex);
+        reOrderItems(reOrderedItems);
+        return reOrderedItems;
+      });
     }
   }
+
+  useEffect(() => {
+    setBasket(liveBasket);
+  }, [liveBasket]);
 
   return (
     <div
@@ -71,23 +83,23 @@ function BBList({
         >
           <ul className="w-full">
             {basket.map((item: BasketItem) =>
-              item.isCompleted ? null : (
+              item.status === BASKET_ITEM_STATUS.UNPICKED ? (
                 <BBItem
                   key={item.id}
                   data={item}
                   onComplete={() => handleTaskComplete(item.id)}
                   onDelete={() => handleTaskDelete(item.id)}
                 />
-              ),
+              ) : null,
             )}
           </ul>
         </SortableContext>
       </DndContext>
       <ul className="w-full">
         {basket.map((item: BasketItem) =>
-          item.isCompleted ? (
+          item.status === BASKET_ITEM_STATUS.PICKED ? (
             <BBItem
-              key={item.id}
+              key={item.position}
               data={item}
               onComplete={() => handleTaskComplete(item.id)}
               onDelete={() => handleTaskDelete(item.id)}
@@ -95,10 +107,6 @@ function BBList({
           ) : null,
         )}
       </ul>
-      <div>
-        filter items instead of a new one. Completed(can be uncompleted),
-        unsortable, deletable, action button
-      </div>
     </div>
   );
 }

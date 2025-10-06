@@ -1,6 +1,8 @@
 import PWABadge from "./PWABadge.tsx";
 import "./App.css";
 import BBBasket from "./features/BBBasket.tsx";
+import BBList from "./components/BBList/BBList.tsx";
+import BBListTest from "./test/components/BBListTest.tsx";
 
 function App() {
   return (
@@ -12,5 +14,8 @@ function App() {
     </>
   );
 }
+
+//<BBBasket />
+//<BBList />
 
 export default App;

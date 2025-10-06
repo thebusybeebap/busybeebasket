@@ -2,6 +2,7 @@
 import { v7 as uuidv7 } from "uuid";
 
 import { BBSearchable } from "../components/BBAutocomplete";
+import { BASKET_ITEM_STATUS } from "../services/bbddb";
 
 export function generateId() {
   return uuidv7();
@@ -14,7 +15,8 @@ export interface BasketItem {
   price?: number;
   shopId: string; //key
   shopName: string;
-  isCompleted: boolean; //status
+  status: BASKET_ITEM_STATUS;
+  position: number;
 }
 
 export interface Shop extends BBSearchable {

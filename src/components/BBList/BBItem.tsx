@@ -1,7 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Square, SquareCheck, X } from "lucide-react";
 import { BasketItem } from "../../data/models";
+import { BASKET_ITEM_STATUS } from "../../services/bbddb";
+import { CSS } from "@dnd-kit/utilities";
+
+//TODO: FIX DRAGGING UI
 
 export type BBItemParams = {
   data: BasketItem;
@@ -28,8 +31,8 @@ function BBItem({ data, onComplete, onDelete }: BBItemParams) {
   return (
     <li
       className={
-        "group flex px-1 py-2 wrap-anywhere sm:border-y-1 " +
-        (isDragging ? " bg-red-500" : "")
+        "group flex bg-blue-500 px-1 py-2 wrap-anywhere sm:border-y-1 " +
+        (isDragging ? " z-0 bg-red-500" : "")
       }
       style={style}
       ref={setNodeRef}
@@ -38,7 +41,9 @@ function BBItem({ data, onComplete, onDelete }: BBItemParams) {
       <div
         className={
           "grow-0 hover:cursor-move" +
-          (data.isCompleted ? " opacity-0" : " opacity-70 hover:opacity-100")
+          (data.status === BASKET_ITEM_STATUS.PICKED
+            ? " opacity-0"
+            : " opacity-70 hover:opacity-100")
         }
         ref={setActivatorNodeRef}
         {...listeners}
@@ -47,7 +52,7 @@ function BBItem({ data, onComplete, onDelete }: BBItemParams) {
       </div>
 
       <div className="grow-0 pr-1 pl-4 opacity-70 hover:opacity-100">
-        {data.isCompleted ? (
+        {data.status === BASKET_ITEM_STATUS.PICKED ? (
           <SquareCheck
             onClick={() => onComplete()}
             className="opacity-50 hover:cursor-pointer"
@@ -62,7 +67,10 @@ function BBItem({ data, onComplete, onDelete }: BBItemParams) {
 
       <div
         className={
-          "grow-1 px-2" + (data.isCompleted ? " line-through opacity-50" : "")
+          "grow-1 px-2" +
+          (data.status === BASKET_ITEM_STATUS.PICKED
+            ? " line-through opacity-50"
+            : "")
         }
       >
         {

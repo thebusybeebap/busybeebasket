@@ -1,6 +1,5 @@
 import { CircleX } from "lucide-react";
 import { useRef, useState } from "react";
-
 export interface BBSearchable {
   id: string;
   name: string;
@@ -69,6 +68,7 @@ function BBAutocomplete<T extends BBSearchable>({
     setSuggestions([]);
     setShowCreateOption(false);
     onSelect();
+    searchInputRef.current?.focus(); //TODO: TOFIX, FOCUS AFTER CLEAR
   }
 
   function resetNoSelected() {

@@ -1,6 +1,6 @@
 //TODO: Add Dexie calls to sync with local storage
-
-import { useState } from "react";
+//TODO: Connect/merge with useBasketItem
+/*import { useState } from "react";
 import { BasketItem } from "../../data/models";
 import { arrayMove } from "@dnd-kit/sortable";
 
@@ -16,6 +16,7 @@ function useBBList() {
   }
 
   function checkItem(id: string) {
+    //TODO: Based on status
     setBasket((prevBasket) =>
       prevBasket.map((item) =>
         item.id === id ? { ...item, isCompleted: !item.isCompleted } : item,
@@ -36,3 +37,4 @@ function useBBList() {
 }
 
 export default useBBList;
+*/

@@ -31,3 +31,13 @@ export function shopItemMatchedSortValue(
     return 3;
   }
 }
+
+/*export function reIndexObjectArray<T extends object>(
+  orderedArray: T[],
+  indexPropertyName: string,
+) {
+  return orderedArray.map((el, index) => ({
+    ...el,
+    [indexPropertyName]: index,
+  }));
+}*/
