@@ -1,8 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import {
+  Ban,
   Delete,
   GripVertical,
   PhilippinePeso,
+  Save,
   Square,
   SquareCheck,
   SquarePen,
@@ -12,6 +14,9 @@ import {
 import { BasketItem } from "../../data/models";
 import { BASKET_ITEM_STATUS } from "../../services/bbddb";
 import { CSS } from "@dnd-kit/utilities";
+import { useRef, useState } from "react";
+import { PersistShopItems } from "../../services/ShopItems";
+import { PersistBasketItems } from "../../services/BasketItems";
 
 //TODO: DONE FIX:FIXED DRAGGING UI
 
@@ -38,10 +43,37 @@ function BBItem({
     isDragging,
   } = useSortable({ id: data.id });
 
+  let [isEditingPrice, setIsEditingPrice] = useState(false);
+  let priceInputRef = useRef<HTMLInputElement>(null);
+
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
   };
+
+  function handleSavePriceEdit() {
+    if (priceInputRef.current) {
+      let newPrice = parseFloat(priceInputRef.current.value);
+      if (!isNaN(newPrice) && newPrice >= 0) {
+        PersistShopItems.updateShopItemPrice(
+          data.itemId,
+          data.shopId,
+          newPrice,
+        );
+        PersistBasketItems.updateBasketItemPrice(data.id, newPrice);
+        //TODO: TO REFACTOR, Don't call Persist functions here. Also Source Price not from BasketItem but dynamically fetch PRICE base on itemId and ShopId. Cause editing the price at this page doesn't really update the other instances of the same ShopItem in the list(Maybe a use case where you don't really want to update??? also other ways to edit for common use cases)
+      }
+    }
+    setIsEditingPrice(false);
+  }
+
+  function handleCancelPriceEdit() {
+    setIsEditingPrice(false);
+  }
+
+  function handlePriceEdit() {
+    setIsEditingPrice(true);
+  }
 
   return (
     <li
@@ -69,15 +101,48 @@ function BBItem({
               </div>
               <div className="flex flex-1 gap-1">
                 <div className="flex shrink-0">
-                  <SquarePen className="cursor-pointer rounded-lg text-gray-700 opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50" />
-                  <label className="shrink-0 font-medium text-neutral-500">
-                    Price:{" "}
-                  </label>
+                  {isEditingPrice ? (
+                    <>
+                      <Save
+                        onClick={handleSavePriceEdit}
+                        className="cursor-pointer rounded-lg text-green-700 opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50"
+                      />
+                      <Ban
+                        onClick={handleCancelPriceEdit}
+                        className="cursor-pointer rounded-lg text-red-700 opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <SquarePen
+                        onClick={handlePriceEdit}
+                        className="cursor-pointer rounded-lg text-gray-700 opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50"
+                      />
+
+                      <label className="shrink-0 font-medium text-neutral-500">
+                        Price:{" "}
+                      </label>
+                    </>
+                  )}
                 </div>
-                <span>
-                  &#8369;
-                  {data.price?.toFixed(2)}
-                </span>
+                <div className="grow-0">
+                  {isEditingPrice ? (
+                    <input
+                      ref={priceInputRef}
+                      autoFocus
+                      step="0.01"
+                      min="0"
+                      className="w-full rounded-md border pl-1 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+                      type="number"
+                      defaultValue={data.price}
+                    />
+                  ) : (
+                    <span>
+                      &#8369;
+                      {data.price?.toFixed(2)}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

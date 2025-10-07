@@ -7,7 +7,6 @@ function ShopItemDetails(
   //showShopName: boolean,
   selectedShop?: Shop,
 ) {
-  console.dir(item);
   return (
     <div className="flex">
       {selectedShop ? null : ( // works only for sinlge shop selection

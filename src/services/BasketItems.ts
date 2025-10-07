@@ -107,4 +107,10 @@ export namespace PersistBasketItems {
       .equals(BASKET_ITEM_STATUS.BAGGED)
       .delete();
   }
+
+  export async function updateBasketItemPrice(id: string, newPrice: number) {
+    let updatedItem = await bbbdb.basketItems.update(id, {
+      price: newPrice,
+    });
+  }
 }

@@ -13,4 +13,15 @@ export namespace PersistShopItems {
     let shopItems = await bbbdb.shopItems.toArray();
     return shopItems;
   }
+
+  export async function updateShopItemPrice(
+    itemId: string,
+    shopId: string,
+    newPrice: number,
+  ) {
+    //@ts-expect-error
+    let updatedItem = await bbbdb.shopItems.update([shopId, itemId], {
+      price: newPrice,
+    });
+  }
 }
