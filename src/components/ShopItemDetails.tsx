@@ -7,19 +7,30 @@ function ShopItemDetails(
   //showShopName: boolean,
   selectedShop?: Shop,
 ) {
+  console.dir(item);
   return (
-    <>
-      {selectedShop && item.shopName ? (
-        <span
-          className={
-            selectedShop.id === item.shopId ? "bg-amber-900" : "bg-current"
-          }
-        >
-          {"Store: " + item.shopName}
+    <div className="flex">
+      {selectedShop ? null : ( // works only for sinlge shop selection
+        <div className="flex-2 p-1">
+          <span>Shop: </span>
+          <span
+            className={
+              !selectedShop && item.shopName === "NONE" ? "bg-amber-200" : ""
+            }
+          >
+            {item.shopName}
+          </span>
+        </div>
+      )}
+
+      {"price" in item ? (
+        <span className="flex-1">
+          {"Price: "}
+          &#8369;
+          {(item.price ?? 0).toFixed(2)}
         </span>
       ) : null}
-      {item.price ? <span>{"Price: " + item.price}</span> : null}
-    </>
+    </div>
   );
 }
 

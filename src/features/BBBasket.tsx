@@ -80,11 +80,8 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
-  //TODO:DONE sortable dragging ui fix and improvements
-  //TODO:DONE Icon Buttons
-  //TODO:DONE bagged section ui
-  //TODO:DONE colors
-  //TODO:DONE BUGFIX:FIXED Newly Added Item has No Shop property on bagged view
+  //TODO: Suggestion Details, BugFix and UI
+  //TODO: Edit Price function
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 pt-4 pb-2">
