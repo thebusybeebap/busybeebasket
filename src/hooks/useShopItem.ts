@@ -246,9 +246,15 @@ function useShopItem() {
 
           let item = await bbbdb.items.get(ItemId);
           let shopItem = await bbbdb.shopItems.get(shopItemId);
+          let shop = await bbbdb.shops.get(shopId);
           let mergedId = (shopItem?.itemId ?? "") + shopItem?.shopId;
 
-          let merged = { id: mergedId, ...shopItem, name: item?.name ?? "" }; //to fix/refactor
+          let merged = {
+            id: mergedId,
+            ...shopItem,
+            shopName: shop?.name,
+            name: item?.name,
+          }; //to fix/refactor
 
           return merged;
         },

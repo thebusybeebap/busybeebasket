@@ -6,7 +6,13 @@ import useShopItem from "../hooks/useShopItem";
 import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
-import { ScanBarcode, SquarePlus } from "lucide-react";
+import {
+  CirclePlus,
+  PackageSearch,
+  ScanBarcode,
+  SquarePlus,
+  Store,
+} from "lucide-react";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
@@ -142,7 +148,7 @@ function BBItemSearch({
   }
 
   return (
-    <div className="flex flex-col gap-2 bg-blue-900">
+    <div className="flex flex-col gap-2 bg-neutral-100">
       <div className="flex-1 p-1">
         <BBAutocomplete<Shop>
           suggestionsFunction={getShopSuggestions}
@@ -154,7 +160,8 @@ function BBItemSearch({
           updateSearchValue={setShopSearchValue}
         />
       </div>
-      <div className="flex w-full flex-1 gap-2 border-2 border-solid p-1 pr-2">
+      <div className="flex w-full flex-1 gap-1 border-2 border-solid p-2">
+        <PackageSearch />
         <BBAutocomplete<ShopItem>
           suggestionsFunction={getItemsSuggestions}
           selected={selectedItem}
@@ -165,12 +172,8 @@ function BBItemSearch({
           updateSearchValue={setItemSearchValue}
           suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
         />
-        <button>
-          <SquarePlus
-            className="rounded-md bg-gray-600 px-1"
-            size={32}
-            onClick={handleAddAction}
-          />
+        <button className="cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50">
+          <SquarePlus size={40} strokeWidth={1.5} onClick={handleAddAction} />
         </button>
       </div>
     </div>

@@ -1,13 +1,12 @@
 import PWABadge from "./PWABadge.tsx";
 import "./App.css";
 import BBBasket from "./features/BBBasket.tsx";
-import BBList from "./components/BBList/BBList.tsx";
-import BBListTest from "./test/components/BBListTest.tsx";
 
 function App() {
+  //Wouter for simple routing of item/shop management pages https://github.com/molefrog/wouter
   return (
     <>
-      <div className="h-dvh bg-purple-900 px-4">
+      <div className="h-dvh bg-neutral-100 px-4">
         <BBBasket />
       </div>
       <PWABadge />

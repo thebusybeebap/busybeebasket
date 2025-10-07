@@ -1,4 +1,5 @@
 import {
+  closestCenter,
   closestCorners,
   DndContext,
   DragEndEvent,
@@ -68,12 +69,12 @@ function BBList({
   return (
     <div
       className={
-        "flex h-full w-full flex-col items-center overflow-y-auto px-2 py-8"
+        "flex h-full w-full flex-col items-center overflow-y-auto px-1 py-8"
       }
     >
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={closestCenter}
         onDragEnd={(event) => handleDragEnd({ event })}
         modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
       >
@@ -99,7 +100,7 @@ function BBList({
         {basket.map((item: BasketItem) =>
           item.status === BASKET_ITEM_STATUS.PICKED ? (
             <BBItem
-              key={item.position}
+              key={item.id}
               data={item}
               onComplete={() => handleTaskComplete(item.id)}
               onDelete={() => handleTaskDelete(item.id)}

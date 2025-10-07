@@ -4,7 +4,14 @@ import BBList from "../components/BBList/BBList";
 import { useState } from "react";
 import { BASKET_ITEM_STATUS } from "../services/bbddb";
 import useBasketItem from "../hooks/useBasketItem";
-import { ShoppingBasket, ShoppingCart, Trash, Trash2 } from "lucide-react";
+import {
+  ArchiveX,
+  ShoppingBasket,
+  ShoppingCart,
+  Trash,
+  Trash2,
+} from "lucide-react";
+import BagList from "../components/Bag/BagList";
 
 function BBBasket() {
   let {
@@ -55,7 +62,13 @@ function BBBasket() {
   }
 
   function handleEmptyBasket() {
+    //if (
+    //  confirm(
+    //    "Are you sure you want to delete all picked and unpicked items in your basket?",
+    //  ) == true
+    //) {
     emptyBasket();
+    //}
   }
 
   function handleEmptyBag() {
@@ -67,43 +80,73 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
+  //TODO:DONE sortable dragging ui fix and improvements
+  //TODO:DONE Icon Buttons
+  //TODO:DONE bagged section ui
+  //TODO:DONE colors
+  //TODO:DONE BUGFIX:FIXED Newly Added Item has No Shop property on bagged view
+
   return (
-    <div className="flex h-full flex-col bg-green-900 py-4">
-      <div className="flex-grow-0">
-        <BBItemSearch onAddAction={handleAddItem} />
-      </div>
+    <div className="flex h-full flex-col bg-neutral-100 pt-4 pb-2">
       {isPicking ? (
         <>
-          <div className="flex-grow-1 overflow-x-hidden overflow-y-auto bg-teal-300">
-            <BBList
-              liveBasket={liveBasket}
-              removeItem={handleRemoveItem}
-              checkItem={handleItemCheck}
-              reOrderItems={handleItemReorder}
-            />
+          <div className="flex-grow-0">
+            <BBItemSearch onAddAction={handleAddItem} />
           </div>
 
-          <div className="mt-auto flex gap-2 bg-orange-600">
+          <div className="flex-grow-1 overflow-x-hidden overflow-y-auto bg-neutral-100">
+            {liveBasket.reduce(
+              (count, item) =>
+                item.status !== BASKET_ITEM_STATUS.BAGGED ? count + 1 : count,
+              0,
+            ) === 0 ? (
+              <div className="flex h-full items-center justify-center">
+                <div className="rounded-lg border-4 border-dashed p-10 text-xl opacity-20">
+                  Your Basket is Empty
+                </div>
+              </div>
+            ) : (
+              <BBList
+                liveBasket={liveBasket}
+                removeItem={handleRemoveItem}
+                checkItem={handleItemCheck}
+                reOrderItems={handleItemReorder}
+              />
+            )}
+          </div>
+
+          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-neutral-100 pt-2">
             <button
-              className="flex-1 rounded-md border-1 bg-red-800"
               onClick={handleEmptyBasket}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              aria-label="Empty basket"
             >
-              <Trash2 />
-              Empty Basket
+              <Trash2 className="flex-shrink-0 text-gray-700" />
+              <span className="text-xs font-medium text-gray-700">
+                Empty Basket
+              </span>
             </button>
+
             <button
-              className="flex-1 rounded-md border-1 bg-orange-800"
               onClick={handleRemoveUnpicked}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              aria-label="Empty basket"
             >
-              <Trash />
-              Remove Unpicked
+              <Trash className="flex-shrink-0 text-gray-700" />
+              <span className="text-xs font-medium text-gray-700">
+                Remove Unpicked
+              </span>
             </button>
+
             <button
-              className="flex-1 rounded-md border-1 bg-green-800"
               onClick={handleDonePicking}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              aria-label="Empty basket"
             >
-              <ShoppingCart />
-              Done Picking
+              <ShoppingCart className="flex-shrink-0 text-gray-700" />
+              <span className="text-xs font-medium text-gray-700">
+                Done Picking
+              </span>
             </button>
           </div>
         </>
@@ -111,32 +154,75 @@ function BBBasket() {
       {isPicking ? null : (
         <div
           className={
-            "flex h-full flex-col bg-gray-600 " +
+            "flex h-full flex-col bg-neutral-100 " +
             (isPicking ? "mt-auto" : "flex-grow-1")
           }
         >
-          <ul className="w-full">
-            {liveBasket.map((item: BasketItem) =>
-              item.status === BASKET_ITEM_STATUS.BAGGED ? (
-                <li>{item.name}</li>
-              ) : null,
-            )}
-          </ul>
-
-          <div className="mt-auto flex gap-2 bg-orange-600">
+          {liveBasket.reduce(
+            (count, item) =>
+              item.status === BASKET_ITEM_STATUS.BAGGED ? count + 1 : count,
+            0,
+          ) === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="rounded-lg border-4 border-dashed p-10 text-xl opacity-20">
+                Your Bag is Empty
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex border-b-1 px-2">
+                <div className="flex-1">
+                  <span>Number of Items:</span>
+                  <span className="font-medium">
+                    {liveBasket.reduce(
+                      (count, item) =>
+                        item.status === BASKET_ITEM_STATUS.BAGGED
+                          ? count + 1
+                          : count,
+                      0,
+                    )}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <span>Total Price:</span>
+                  <span className="font-medium">
+                    &#8369;
+                    {liveBasket
+                      .reduce(
+                        (total, item) =>
+                          item.status === BASKET_ITEM_STATUS.BAGGED
+                            ? total + (item?.price ?? 0)
+                            : total,
+                        0,
+                      )
+                      .toFixed(2)}
+                  </span>
+                </div>
+              </div>
+              <BagList basket={liveBasket} removeItem={handleRemoveItem} />
+            </>
+          )}
+          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-neutral-100 pt-2">
             <button
-              className="flex-1 rounded-md border-1 bg-red-800"
               onClick={handleEmptyBag}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              aria-label="Empty basket"
             >
-              <Trash2 />
-              Empty Bag
+              <ArchiveX className="flex-shrink-0 text-gray-700" />
+              <span className="text-xs font-medium text-gray-700">
+                Empty Bag
+              </span>
             </button>
+
             <button
-              className="flex-1 rounded-md border-1 bg-blue-800"
               onClick={handlePickMore}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              aria-label="Empty basket"
             >
-              <ShoppingBasket />
-              Pick More Items
+              <ShoppingBasket className="flex-shrink-0 text-gray-700" />
+              <span className="text-xs font-medium text-gray-700">
+                Pick More Items
+              </span>
             </button>
           </div>
         </div>

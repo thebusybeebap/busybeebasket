@@ -1,5 +1,7 @@
 import { CircleX } from "lucide-react";
 import { useRef, useState } from "react";
+
+//TODO: UI Items details and match
 export interface BBSearchable {
   id: string;
   name: string;
@@ -139,17 +141,21 @@ function BBAutocomplete<T extends BBSearchable>({
           onChange={populateSuggestionsFromSearchValue}
           onFocus={populateSuggestionsFromSelected}
           onBlur={resetNoSelected}
-          className={"w-full truncate rounded-sm border-2 py-1 pr-7 pl-2"}
+          className={
+            "w-full truncate rounded-xl border-2 py-1 pr-7 pl-2 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+          }
         />
       </div>
 
-      <ul className="absolute z-10 w-full max-w-full bg-red-700 shadow-lg">
+      <ul className="absolute z-10 w-full max-w-full rounded-xl bg-neutral-100 shadow-lg">
         {suggestions.map((suggestion) => {
           return (
             <li
               className={
-                "px-2 py-2 " +
-                (searchValue === suggestion.name ? "bg-amber-300" : "bg-white")
+                "cursor-pointer rounded-xl px-2 py-2 " +
+                (searchValue === suggestion.name
+                  ? "border-2 border-dashed border-amber-200 hover:bg-amber-200"
+                  : "bg-neutral-100 hover:bg-neutral-200")
               }
               onMouseDownCapture={(event) => handleSelect(event, suggestion)}
               key={suggestion.id}
@@ -168,12 +174,15 @@ function BBAutocomplete<T extends BBSearchable>({
 
         {showCreateOption ? (
           <li
-            className="px-2 py-2"
+            className="cursor-pointer rounded-xl border-2 border-dashed border-neutral-200 px-2 py-2 hover:bg-neutral-200"
             onMouseDownCapture={(event) =>
               handleCreateNewOption(event, searchValue)
             }
           >
-            <span className="text-xl">{'Add New "' + searchValue + '"'}</span>
+            <span className="text-xl">
+              <span className="opacity-50">+Add New </span>
+              {'"' + searchValue.trim() + '"'}
+            </span>
           </li>
         ) : null}
       </ul>
