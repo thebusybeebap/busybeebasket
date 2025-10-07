@@ -80,8 +80,10 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
-  //TODO: Suggestion Details, BugFix and UI
-  //TODO: Edit Price function
+  //TODO:DONE Suggestion Details, BugFix and UI
+  //TODO:DONE Edit Price function
+  //TODO: Shop Record Management(Edit Name, Delete Shop, etc)
+  //TODO: Item Record Management(Edit Name, Delete Item/ShopItem, etc)
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 pt-4 pb-2">

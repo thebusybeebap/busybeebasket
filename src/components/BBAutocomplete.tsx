@@ -153,7 +153,8 @@ function BBAutocomplete<T extends BBSearchable>({
             <li
               className={
                 "cursor-pointer rounded-xl px-2 py-2 " +
-                (searchValue === suggestion.name
+                (searchValue.trim().toLocaleLowerCase() ===
+                suggestion.name.trim().toLocaleLowerCase()
                   ? "border-2 border-dashed border-amber-200 hover:bg-amber-200"
                   : "bg-neutral-100 hover:bg-neutral-200")
               }
