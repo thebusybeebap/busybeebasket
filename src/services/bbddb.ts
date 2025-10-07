@@ -57,7 +57,7 @@ bbbdb.version(1).stores({
   shops: "&id, &name, updatedAt",
   items: "&id, &name, &barcode, updatedAt",
   shopItems: "&[shopId+itemId], shopId, itemId, updatedAt",
-  basketItems: "&id, status, position",
+  basketItems: "&id, [shopId+itemId], status, position",
 });
 
 bbbdb.on("populate", function (transaction) {

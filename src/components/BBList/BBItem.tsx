@@ -60,8 +60,14 @@ function BBItem({
           data.shopId,
           newPrice,
         );
-        PersistBasketItems.updateBasketItemPrice(data.id, newPrice);
-        //TODO: TO REFACTOR, Don't call Persist functions here. Also Source Price not from BasketItem but dynamically fetch PRICE base on itemId and ShopId. Cause editing the price at this page doesn't really update the other instances of the same ShopItem in the list(Maybe a use case where you don't really want to update??? also other ways to edit for common use cases)
+        //PersistBasketItems.updateBasketItemPrice(data.id, newPrice);
+        PersistBasketItems.updateSameBasketItemPrices(
+          data.shopId,
+          data.itemId,
+          newPrice,
+        );
+        //TODO: TO REFACTOR, Don't call Persist functions here
+        //TODO: Better Price formatting as well when reaching high values(over 4 digits)
       }
     }
     setIsEditingPrice(false);
@@ -137,7 +143,7 @@ function BBItem({
                       defaultValue={data.price}
                     />
                   ) : (
-                    <span>
+                    <span className="grow-0">
                       &#8369;
                       {data.price?.toFixed(2)}
                     </span>
