@@ -110,7 +110,7 @@ export namespace PersistBasketItems {
 
   export async function updateBasketItemPrice(id: string, newPrice: number) {
     // could be useful if working with historical data
-    let updatedPrice = await bbbdb.basketItems.update(id, {
+    await bbbdb.basketItems.update(id, {
       price: newPrice,
     });
   }
@@ -120,9 +120,8 @@ export namespace PersistBasketItems {
     itemId: string,
     newPrice: number,
   ) {
-    let updatePrice = await bbbdb.basketItems
+    await bbbdb.basketItems
       .where({ shopId: shopId, itemId: itemId })
       .modify({ price: newPrice });
-    console.dir(updatePrice);
   }
 }

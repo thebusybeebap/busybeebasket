@@ -22,7 +22,7 @@ function BBBasket() {
     updateBasketItemStatus,
     emptyBasket,
     deleteUnpickedItems,
-    deletePickedItems,
+    //deletePickedItems,
     bagPickedItems,
     deleteBaggedItems,
   } = useBasketItem();

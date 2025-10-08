@@ -1,9 +1,9 @@
 import { useState } from "react";
-import bbbdb, { generateId, ShopPersistStorage } from "../services/bbddb";
+import bbbdb, { generateId } from "../services/bbddb";
 import { Shop } from "../data/models";
 import { PersistShops } from "../services/Shops";
 import { PagingStrategies } from "../utils/PagingStrategies";
-import { cleanString, matchedSortValue } from "../utils/Utilities";
+import { matchedSortValue } from "../utils/Utilities";
 
 function useShop() {
   let [isShopLoading, setIsShopLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time

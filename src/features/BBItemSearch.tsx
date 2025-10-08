@@ -7,11 +7,9 @@ import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import {
-  CirclePlus,
   PackageSearch,
-  ScanBarcode,
+  //ScanBarcode,
   SquarePlus,
-  Store,
 } from "lucide-react";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
@@ -22,7 +20,7 @@ function BBItemSearch({
   onAddAction: (searchedItem: ShopItem) => void;
 }) {
   let [selectedShop, setSelectedShop] = useState<Shop>();
-  let { fetchShopsByNameQuery, createShop, isShopLoading } = useShop();
+  let { fetchShopsByNameQuery, createShop } = useShop();
   let [shopSearchValue, setShopSearchValue] = useState("");
 
   let [selectedItem, setSelectedItem] = useState<ShopItem>();
@@ -30,7 +28,6 @@ function BBItemSearch({
     fetchItemsInShopByNameQuery,
     fetchItemsInAllShopsByNameQuery,
     createShopItem,
-    isShopItemLoading,
   } = useShopItem();
   let [itemSearchValue, setItemSearchValue] = useState("");
 
@@ -142,10 +139,10 @@ function BBItemSearch({
     return { suggestionsResult: shopItems, hasExactMatch };
   }
 
-  function handleSearchByQR() {
-    // search item match for QR code, then fill selectedItem with details, (could add checkbox for auto add in list if a Shop is selected)
-    //setItemToAdd(newBasketItem);
-  }
+  //function handleSearchByQR() {
+  // search item match for QR code, then fill selectedItem with details, (could add checkbox for auto add in list if a Shop is selected)
+  //setItemToAdd(newBasketItem);
+  //}
 
   return (
     <div className="flex flex-col gap-2 bg-neutral-100">

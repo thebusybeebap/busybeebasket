@@ -1,15 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import {
   Ban,
-  Delete,
   GripVertical,
-  PhilippinePeso,
   Save,
   Square,
   SquareCheck,
   SquarePen,
   SquareX,
-  X,
 } from "lucide-react";
 import { BasketItem } from "../../data/models";
 import { BASKET_ITEM_STATUS } from "../../services/bbddb";

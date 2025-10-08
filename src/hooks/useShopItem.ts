@@ -14,8 +14,6 @@ import { PersistShopItems } from "../services/ShopItems";
 import { PagingStrategies } from "../utils/PagingStrategies";
 import { matchedSortValue, shopItemMatchedSortValue } from "../utils/Utilities";
 
-const PAGE_SIZE = 10;
-
 function generateShopItems(
   baseDetailItems: ShopItemPersistStorage[],
   itemDetails: Map<string, ItemPersistStorage>,

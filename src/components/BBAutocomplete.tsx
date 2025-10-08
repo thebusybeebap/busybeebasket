@@ -104,9 +104,7 @@ function BBAutocomplete<T extends BBSearchable>({
     );
   }
 
-  function populateSuggestionsFromSelected(
-    event: React.FocusEvent<HTMLInputElement>,
-  ) {
+  function populateSuggestionsFromSelected() {
     if (selected) {
       suggestionsFunction(selected.name).then(
         ({ suggestionsResult, hasExactMatch }) => {
