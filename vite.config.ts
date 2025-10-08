@@ -20,10 +20,12 @@ export default defineConfig({
       },
 
       manifest: {
-        name: "busybeebasket",
-        short_name: "bbbasket",
-        description: "Grocery List App",
-        theme_color: "#ffffff",
+        name: "BusyBeeBasket",
+        short_name: "BBBasket",
+        description: "An Offline Grocery List App",
+        display: "standalone",
+        theme_color: "#f5f5f6",
+        background_color: "#f5f5f6",
       },
 
       workbox: {
