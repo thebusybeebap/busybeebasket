@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PersistItems } from "../services/Items.js";
 
 import useShop from "../hooks/useShop";
 import useShopItem from "../hooks/useShopItem";
@@ -6,11 +7,8 @@ import useShopItem from "../hooks/useShopItem";
 import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
-import {
-  PackageSearch,
-  //ScanBarcode,
-  SquarePlus,
-} from "lucide-react";
+import BarcodeScanner from "../components/BarcodeScanner";
+import { PackageSearch, SquarePlus } from "lucide-react";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
@@ -22,14 +20,26 @@ function BBItemSearch({
   let [selectedShop, setSelectedShop] = useState<Shop>();
   let { fetchShopsByNameQuery, createShop } = useShop();
   let [shopSearchValue, setShopSearchValue] = useState("");
-
   let [selectedItem, setSelectedItem] = useState<ShopItem>();
+  let [itemSearchValue, setItemSearchValue] = useState("");
   let {
     fetchItemsInShopByNameQuery,
     fetchItemsInAllShopsByNameQuery,
     createShopItem,
   } = useShopItem();
-  let [itemSearchValue, setItemSearchValue] = useState("");
+
+  async function setItemSearchValueByBarcode(scannedBarcode: string) {
+    let scannedItem = await PersistItems.getItemByBarcode(scannedBarcode);
+    if (scannedItem) {
+      setSelectedItem(undefined);
+      setItemSearchValue(scannedItem.name);
+
+      //TODO: FIX When scanning a selected item, it does show suggestions, and even different shop.. not sure weird
+    } else {
+      //setSelectedItem(undefined); //TODO: REMOVE keep values since nothing is selected
+      //setItemSearchValue("Empty"); //TODO: Make a toast?
+    }
+  }
 
   function handleAddAction() {
     if (selectedItem) {
@@ -51,6 +61,9 @@ function BBItemSearch({
       }
     } else {
       setSelectedShop(undefined);
+      setShopSearchValue("");
+      setSelectedItem(undefined); //TODO: Update that item only "clears" if item does not exist in shop
+      setItemSearchValue("");
     }
   }
 
@@ -139,54 +152,40 @@ function BBItemSearch({
     return { suggestionsResult: shopItems, hasExactMatch };
   }
 
-  //function handleSearchByQR() {
-  // search item match for QR code, then fill selectedItem with details, (could add checkbox for auto add in list if a Shop is selected)
-  //setItemToAdd(newBasketItem);
-  //}
-
   return (
-    <div className="flex flex-col gap-2 bg-neutral-100">
-      <div className="flex-1 p-1">
-        <BBAutocomplete<Shop>
-          suggestionsFunction={getShopSuggestions}
-          selected={selectedShop}
-          onSelect={handleShopSelect}
-          onCreateNew={handleCreateNewShop}
-          placeHolder="Search Shop"
-          searchValue={shopSearchValue}
-          updateSearchValue={setShopSearchValue}
-        />
+    <>
+      <div className="flex flex-col gap-2 bg-neutral-100">
+        <div className="flex-1 p-1">
+          <BBAutocomplete<Shop>
+            suggestionsFunction={getShopSuggestions}
+            selected={selectedShop}
+            onSelect={handleShopSelect}
+            onCreateNew={handleCreateNewShop}
+            placeHolder="Search Shop"
+            searchValue={shopSearchValue}
+            updateSearchValue={setShopSearchValue}
+          />
+        </div>
+        <div className="flex w-full flex-1 gap-1 border-2 border-solid p-2">
+          <PackageSearch />
+          <BBAutocomplete<ShopItem>
+            suggestionsFunction={getItemsSuggestions}
+            selected={selectedItem}
+            onSelect={handleItemSelect}
+            onCreateNew={handleCreateNewItem}
+            placeHolder="Search Item"
+            searchValue={itemSearchValue}
+            updateSearchValue={setItemSearchValue}
+            suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
+          />
+          <button className="cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50">
+            <SquarePlus size={40} strokeWidth={1.5} onClick={handleAddAction} />
+          </button>
+          <BarcodeScanner callAfterScan={setItemSearchValueByBarcode} />
+        </div>
       </div>
-      <div className="flex w-full flex-1 gap-1 border-2 border-solid p-2">
-        <PackageSearch />
-        <BBAutocomplete<ShopItem>
-          suggestionsFunction={getItemsSuggestions}
-          selected={selectedItem}
-          onSelect={handleItemSelect}
-          onCreateNew={handleCreateNewItem}
-          placeHolder="Search Item"
-          searchValue={itemSearchValue}
-          updateSearchValue={setItemSearchValue}
-          suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
-        />
-        <button className="cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50">
-          <SquarePlus size={40} strokeWidth={1.5} onClick={handleAddAction} />
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
 
 export default BBItemSearch;
-
-/**BARCODE
-<button>
-  <ScanBarcode
-    onClick={() =>
-      console.log(
-        "to implement, function that searches persist layer and then fill the search input boxes.NOT auto add to list, still need to click +",
-      )
-    }
-  />
-</button>
- */

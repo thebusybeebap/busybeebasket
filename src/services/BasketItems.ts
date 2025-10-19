@@ -36,12 +36,14 @@ export namespace PersistBasketItems {
       _basketPositionMoveByOne(currentItems);
 
       let newItem = {
+        ...item,
         id: generateId(),
-        shopId: item.shopId,
-        itemId: item.itemId,
-        price: item.price,
-        name: item.name,
-        shopName: item.shopName,
+        //shopId: item.shopId,
+        //itemId: item.itemId,
+        //price: item.price,
+        //name: item.name,
+        //shopName: item.shopName,
+        //barcode
         status: BASKET_ITEM_STATUS.UNPICKED,
         updatedAt: new Date(Date.now()),
         position: 0,
@@ -123,5 +125,14 @@ export namespace PersistBasketItems {
     await bbbdb.basketItems
       .where({ shopId: shopId, itemId: itemId })
       .modify({ price: newPrice });
+  }
+
+  export async function addBarcode(itemId: string, scannedBarcode: string) {
+    //TODO: DONT DO THIS IF BARCODE IS REGISTERED TO AN ITEM ALREADY
+    // NOT REALLY A CONCERN CAUSE barcode here is not used for search,
+
+    await bbbdb.basketItems
+      .where({ itemId: itemId })
+      .modify({ barcode: scannedBarcode });
   }
 }

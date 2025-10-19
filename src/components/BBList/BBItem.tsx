@@ -3,6 +3,7 @@ import {
   Ban,
   GripVertical,
   Save,
+  ScanBarcode,
   Square,
   SquareCheck,
   SquarePen,
@@ -14,6 +15,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useRef, useState } from "react";
 import { PersistShopItems } from "../../services/ShopItems";
 import { PersistBasketItems } from "../../services/BasketItems";
+import BarcodeScanner from "../BarcodeScanner";
+import { PersistItems } from "../../services/Items";
 
 //TODO: DONE FIX:FIXED DRAGGING UI
 
@@ -78,6 +81,13 @@ function BBItem({
     setIsEditingPrice(true);
   }
 
+  function handleAddBarcode(itemId: string, scannedBarcodeValue: string) {
+    PersistItems.addBarcode(itemId, scannedBarcodeValue); //.then(() => {
+    //TODO: Refactor so that no need to do this and just need to update Item entry only
+    //}); //TODO: Refactor
+    PersistBasketItems.addBarcode(itemId, scannedBarcodeValue);
+  }
+
   return (
     <li
       className={
@@ -91,8 +101,20 @@ function BBItem({
       {simpleMode ? (
         <div className="grow-1 px-2 py-1">
           <div className="h-full w-full cursor-text flex-col items-center gap-2 wrap-anywhere">
-            <div className="w-full flex-1 border-b-1">
-              <span className="text-lg font-medium">{data.name}</span>
+            <div className="flex w-full flex-1 border-b-1">
+              <span className="flex-1 text-lg font-medium">{data.name}</span>
+              {data.barcode ? null : (
+                <div className="grow-0">
+                  <BarcodeScanner
+                    buttonIcon={
+                      <ScanBarcode className="cursor-pointer rounded-lg text-gray-700 opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50" />
+                    }
+                    callAfterScan={(scannedBarcodeValue) =>
+                      handleAddBarcode(data.itemId, scannedBarcodeValue)
+                    }
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex w-full flex-1 gap-4 pt-2">

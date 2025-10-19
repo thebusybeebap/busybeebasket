@@ -23,12 +23,14 @@ function generateShopItems(
     let itemData = itemDetails.get(item.itemId);
     let shopData = shopDetails.get(item.shopId);
     return {
+      // Should put typing here so it would error new field is added
       id: item.itemId + item.shopId,
       itemId: item.itemId,
       name: itemData?.name ?? "",
       shopId: item.shopId,
       shopName: shopData?.name ?? "",
       price: item.price,
+      barcode: itemData?.barcode,
     };
   });
 

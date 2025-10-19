@@ -43,6 +43,7 @@ export interface BasketItemPersistStorage {
   price: number;
   updatedAt: Date;
   position: number;
+  barcode?: string;
 }
 
 const bbbdb = new Dexie("BBBasketDB") as Dexie & {
@@ -57,7 +58,7 @@ bbbdb.version(1).stores({
   shops: "&id, &name, updatedAt",
   items: "&id, &name, &barcode, updatedAt",
   shopItems: "&[shopId+itemId], shopId, itemId, updatedAt",
-  basketItems: "&id, [shopId+itemId], status, position",
+  basketItems: "&id, [shopId+itemId], itemId, status, position",
 });
 
 bbbdb.on("populate", function (transaction) {

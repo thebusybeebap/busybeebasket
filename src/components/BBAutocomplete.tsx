@@ -1,5 +1,5 @@
 import { CircleX } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 //TODO: UI Items details and match
 export interface BBSearchable {
@@ -112,8 +112,23 @@ function BBAutocomplete<T extends BBSearchable>({
           setShowCreateOption(!hasExactMatch);
         },
       );
+    } else if (searchValue) {
+      suggestionsFunction(searchValue).then(
+        ({ suggestionsResult, hasExactMatch }) => {
+          setSuggestions(suggestionsResult);
+          setShowCreateOption(!hasExactMatch);
+        },
+      );
     }
   }
+
+  useEffect(() => {
+    if (searchValue && searchInputRef.current && !selected) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50); //TODO: HACK
+    }
+  }, [searchValue]);
 
   return (
     <div className="relative w-full">

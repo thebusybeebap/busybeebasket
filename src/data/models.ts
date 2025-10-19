@@ -17,6 +17,7 @@ export interface BasketItem {
   shopName: string;
   status: BASKET_ITEM_STATUS;
   position: number;
+  barcode?: string;
 }
 
 export interface Shop extends BBSearchable {
@@ -31,4 +32,5 @@ export interface ShopItem extends BBSearchable {
   shopId: string;
   shopName: string;
   price?: number;
+  barcode?: string;
 }
