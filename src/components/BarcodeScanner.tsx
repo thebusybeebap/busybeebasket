@@ -1,6 +1,10 @@
-import { Ban, Scan, ScanBarcode } from "lucide-react";
-import { createDetector, isSupportedInBrowser } from "../utils/Barcode";
-import { ReactNode, useRef } from "react";
+import { Ban, CameraOff, Scan, ScanBarcode } from "lucide-react";
+import {
+  createDetector,
+  isSupportedInBrowser,
+  hasCameraAccess,
+} from "../utils/Barcode";
+import { ReactNode, useRef, useState } from "react";
 
 function BarcodeScanner({
   callAfterScan,
@@ -12,6 +16,7 @@ function BarcodeScanner({
   let videoRef = useRef<HTMLVideoElement>(null);
   let streamRef = useRef<MediaStream>(null);
   let dialogRef = useRef<HTMLDialogElement>(null);
+  let [hasCamAccess, setHasCamAccess] = useState(false);
 
   function stopScan(barcodeValue?: string) {
     if (streamRef.current) {
@@ -50,6 +55,9 @@ function BarcodeScanner({
     });
     streamRef.current = stream;
 
+    let cameraAccess = await hasCameraAccess();
+    setHasCamAccess(cameraAccess);
+
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
       await videoRef.current.play();
@@ -77,28 +85,34 @@ function BarcodeScanner({
         data-modal
         open={false}
       >
-        <div className="absolute z-10 flex h-9/10 w-full items-center justify-center rounded-t-2xl opacity-20">
-          <div className="absolute flex h-full items-center justify-center">
-            <Scan size={300} strokeWidth={1} />
+        <div className="absolute z-10 flex h-full w-full items-center justify-center rounded-t-2xl">
+          <div className="absolute flex h-full items-center justify-center opacity-20">
+            {hasCamAccess ? (
+              <Scan size={300} strokeWidth={1} />
+            ) : (
+              <CameraOff className="pt-8 pb-16" size={200} strokeWidth={1} />
+            )}
           </div>
-          <div className="absolute flex h-full items-center justify-center">
-            <span className="text-4xl">SCAN BARCODE</span>
-          </div>
+          {hasCamAccess ? (
+            <div className="absolute flex h-full items-center justify-center opacity-20">
+              <span className="text-4xl">SCAN BARCODE</span>
+            </div>
+          ) : null}
+          <button
+            onClick={() => stopScan()}
+            className="z-20 w-full grow-0 cursor-pointer self-end rounded-b-2xl border-4 border-dashed border-red-700/50 bg-neutral-200 text-red-700/50 opacity-100 transition-all hover:text-red-700 active:scale-90 active:text-red-700"
+          >
+            <span className="p-y-2 flex items-center justify-center gap-1 text-2xl">
+              <Ban />
+              Cancel Scan
+            </span>
+          </button>
         </div>
         <video
-          className="block h-full w-full flex-1 rounded-t-2xl border-4 border-neutral-700/20"
+          className="block h-full w-full flex-1 rounded-2xl border-4 border-neutral-700/20"
           ref={videoRef}
           muted
         ></video>
-        <button
-          onClick={() => stopScan()}
-          className="z-20 w-full grow-0 cursor-pointer rounded-b-2xl border-4 border-dashed border-red-700 text-red-700 opacity-50 transition-all hover:opacity-100 active:scale-90 active:opacity-50"
-        >
-          <span className="p-y-2 flex items-center justify-center gap-1 text-2xl">
-            <Ban />
-            Cancel Scan
-          </span>
-        </button>
       </dialog>
     </>
   );

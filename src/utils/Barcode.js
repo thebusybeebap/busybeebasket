@@ -6,19 +6,17 @@ export function createDetector() {
   if (!isSupportedInBrowser()) return;
 
   let detector = new BarcodeDetector({
-    /*formats: [
-      "qr_code",
-      "ean_13",
-      "code_128",
-      "aztec",
-      "data_matrix",
-      "upc_a",
-      "isbn",
-      "issn",
-    ],*/
     formats: ["qr_code", "ean_13", "code_128", "upc_a"],
   });
   return detector;
+}
+
+export async function hasCameraAccess() {
+  let cameraAccess = await navigator.permissions.query({ name: "camera" });
+  if (cameraAccess.state === "granted" || cameraAccess.state === "prompt") {
+    return true;
+  }
+  return false;
 }
 
 /*
