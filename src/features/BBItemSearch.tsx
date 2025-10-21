@@ -9,6 +9,7 @@ import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import BarcodeScanner from "../components/BarcodeScanner";
 import { PackageSearch, SquarePlus } from "lucide-react";
+import toast from "react-hot-toast";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
@@ -36,6 +37,8 @@ function BBItemSearch({
 
       //TODO: FIX When scanning a selected item, it does show suggestions, and even different shop.. not sure weird
     } else {
+      toast.error("Barcode Not Found! Add the Barcode to an Item first.");
+      //TODO: CALL TOAST HERE
       //setSelectedItem(undefined); //TODO: REMOVE keep values since nothing is selected
       //setItemSearchValue("Empty"); //TODO: Make a toast?
     }

@@ -17,6 +17,7 @@ import { PersistShopItems } from "../../services/ShopItems";
 import { PersistBasketItems } from "../../services/BasketItems";
 import BarcodeScanner from "../BarcodeScanner";
 import { PersistItems } from "../../services/Items";
+import toast from "react-hot-toast";
 
 //TODO: DONE FIX:FIXED DRAGGING UI
 
@@ -81,11 +82,15 @@ function BBItem({
     setIsEditingPrice(true);
   }
 
-  function handleAddBarcode(itemId: string, scannedBarcodeValue: string) {
-    PersistItems.addBarcode(itemId, scannedBarcodeValue); //.then(() => {
-    //TODO: Refactor so that no need to do this and just need to update Item entry only
-    //}); //TODO: Refactor
-    PersistBasketItems.addBarcode(itemId, scannedBarcodeValue);
+  async function handleAddBarcode(itemId: string, scannedBarcodeValue: string) {
+    PersistItems.addBarcode(itemId, scannedBarcodeValue)
+      .then(() => {
+        //TODO: maybe create try catch utility
+        PersistBasketItems.addBarcode(itemId, scannedBarcodeValue); //no need to be unique
+        //TODO: Refactor so that no need to do this and just need to update Item entry only
+        toast.success("Barcode Successfully Added to the Item!");
+      })
+      .catch(() => toast.error("Barcode is Already Used by another Item!"));
   }
 
   return (
