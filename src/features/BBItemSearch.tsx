@@ -8,7 +8,7 @@ import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import BarcodeScanner from "../components/BarcodeScanner";
-import { PackageSearch, SquarePlus } from "lucide-react";
+import { PackageSearch, Plus, Settings, SquarePlus } from "lucide-react";
 import toast from "react-hot-toast";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
@@ -157,35 +157,52 @@ function BBItemSearch({
 
   return (
     <>
-      <div className="flex flex-col gap-2 bg-neutral-100">
-        <div className="flex-1 p-1">
-          <BBAutocomplete<Shop>
-            suggestionsFunction={getShopSuggestions}
-            selected={selectedShop}
-            onSelect={handleShopSelect}
-            onCreateNew={handleCreateNewShop}
-            placeHolder="Search Shop"
-            searchValue={shopSearchValue}
-            updateSearchValue={setShopSearchValue}
-          />
+      
+      <div className="flex w-full flex-1 gap-1 p-2 bg-neutral-500">
+
+        <div className="flex flex-1 flex-col gap-2 p-2 bg-neutral-100">
+
+          <div className="flex-1">
+            <BBAutocomplete<Shop>
+              suggestionsFunction={getShopSuggestions}
+              selected={selectedShop}
+              onSelect={handleShopSelect}
+              onCreateNew={handleCreateNewShop}
+              placeHolder="Search Shop"
+              searchValue={shopSearchValue}
+              updateSearchValue={setShopSearchValue}
+            />
+          </div>
+
+          <div className="flex gap-1 flex-1">
+            <BBAutocomplete<ShopItem>
+              suggestionsFunction={getItemsSuggestions}
+              selected={selectedItem}
+              onSelect={handleItemSelect}
+              onCreateNew={handleCreateNewItem}
+              placeHolder="Search Item"
+              searchValue={itemSearchValue}
+              updateSearchValue={setItemSearchValue}
+              suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
+            />
+            <BarcodeScanner callAfterScan={setItemSearchValueByBarcode} />  
+          </div>
+
         </div>
-        <div className="flex w-full flex-1 gap-1 border-2 border-solid p-2">
-          <PackageSearch />
-          <BBAutocomplete<ShopItem>
-            suggestionsFunction={getItemsSuggestions}
-            selected={selectedItem}
-            onSelect={handleItemSelect}
-            onCreateNew={handleCreateNewItem}
-            placeHolder="Search Item"
-            searchValue={itemSearchValue}
-            updateSearchValue={setItemSearchValue}
-            suggestionsDetails={(item) => ShopItemDetails(item, selectedShop)}
-          />
-          <button className="cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50">
-            <SquarePlus size={40} strokeWidth={1.5} onClick={handleAddAction} />
-          </button>
-          <BarcodeScanner callAfterScan={setItemSearchValueByBarcode} />
+
+        <div className="flex h-auto flex-col gap-1">
+          <div className="flex-2/5 pr-1">
+            <button className="float-right cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50">
+              <Settings size={25} strokeWidth={1.5} onClick={()=>{}} />
+            </button>
+          </div>
+          <div className="flex-3/5">
+            <button className="cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50 border-3 h-full">
+              <Plus size={45} strokeWidth={1.5} onClick={handleAddAction}/>
+            </button>
+          </div>
         </div>
+
       </div>
     </>
   );

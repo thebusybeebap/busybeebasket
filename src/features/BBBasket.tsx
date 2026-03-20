@@ -6,12 +6,14 @@ import { BASKET_ITEM_STATUS } from "../services/bbddb";
 import useBasketItem from "../hooks/useBasketItem";
 import {
   ArchiveX,
+  Funnel,
   ShoppingBasket,
   ShoppingCart,
   Trash,
   Trash2,
 } from "lucide-react";
 import BagList from "../components/Bag/BagList";
+import BouncyButton from "../components/ui/BouncyButton";
 
 function BBBasket() {
   let {
@@ -86,14 +88,14 @@ function BBBasket() {
   //TODO: Item Record Management(Edit Name, Delete Item/ShopItem, etc)
 
   return (
-    <div className="flex h-full flex-col bg-neutral-100 pt-4 pb-2">
+    <div className="flex h-full flex-col bg-amber-500">
       {isPicking ? (
         <>
-          <div className="flex-grow-0">
+          <div className="flex-grow-0 pt-4 px-2 bg-neutral-500">
             <BBItemSearch onAddAction={handleAddItem} />
           </div>
 
-          <div className="flex-grow-1 overflow-x-hidden overflow-y-auto bg-neutral-100">
+          <div className="flex-grow-1 overflow-x-hidden overflow-y-auto bg-neutral-100 px-4">
             {liveBasket.reduce(
               (count, item) =>
                 item.status !== BASKET_ITEM_STATUS.BAGGED ? count + 1 : count,
@@ -114,10 +116,11 @@ function BBBasket() {
             )}
           </div>
 
-          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-neutral-100 pt-2">
+          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-neutral-100 py-2">
+            {/*TODO: REFACTOR OWN COMPONENT BUTTONS - REPETITIVE CODE*/}
             <button
               onClick={handleEmptyBasket}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none border`}
               aria-label="Empty basket"
             >
               <Trash2 className="flex-shrink-0 text-gray-700" />
@@ -128,7 +131,7 @@ function BBBasket() {
 
             <button
               onClick={handleRemoveUnpicked}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none border`}
               aria-label="Empty basket"
             >
               <Trash className="flex-shrink-0 text-gray-700" />
@@ -139,7 +142,7 @@ function BBBasket() {
 
             <button
               onClick={handleDonePicking}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
+              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none border`}
               aria-label="Empty basket"
             >
               <ShoppingCart className="flex-shrink-0 text-gray-700" />
@@ -147,6 +150,10 @@ function BBBasket() {
                 Done Picking
               </span>
             </button>
+
+            <BouncyButton size="sm">
+              <Funnel className="flex-shrink-0 text-gray-700" size={45} strokeWidth={1.5}/>
+            </BouncyButton>
           </div>
         </>
       ) : null}

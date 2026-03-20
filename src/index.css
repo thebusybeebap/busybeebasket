@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  --color-bb-prim: oklch(0.3791 0 0);
+  --color-bb-prim-l: oklch(0.7155 0 0);
+
+  --color-bb-off: oklch(0.399 0.0274 58.11);
+  --color-bb-off-l: oklch(0.7434 0.0279 58.15);
+
+  --color-bb-sec: oklch(0.7224 0.1229 58.75);
+  --color-bb-base: oklch(0.9843 0.0096 72.66);
+
+  --color-bb-red: oklch(0.5868 0.144 21.01);
+  --color-bb-red-l: oklch(0.758 0.1447 21.05);
+
+  --color-bb-green: oklch(0.5265 0.132 154.29);
+  --color-bb-green-l: oklch(0.6976 0.1359 154.67);
+}
