@@ -1,32 +1,28 @@
-import { ReactNode } from "react";
 import { tv, type VariantProps } from 'tailwind-variants';
 
-type Variant = "default" | "primary" | "footer";
-type Size = "sm" | "md" | "lg";
-
-const variantClasses: Record<Variant, string> = {
-  "default" : "",
-  "primary" : "",
-  "footer" : "",
-}
-
 export const bButtonStyles = tv({
-  base: "hover:bg-gray-200 transition-all active:scale-90 cursor-pointer rounded-lg",
+  base: "active:bg-bb-sec bg-bb-base hover:bg-bb-sec active:opacity-50 transition-all active:scale-90 cursor-pointer touch-manipulation rounded-lg select-none",
   variants: {
     type: {
       default: "",
-      primary: "",
-      footer: "",
+      icononly: "",
+      texticon: "flex-col gap-1 justify-center items-center active:outline-none active:ring-2 active:ring-bb-prim inline-flex",
     },
     size: {
       sm: "px-2 py-1 text-sm",
       md: "px-4 py-2 text-base",
       lg: "px-6 py-3 text-lg",
+      tl: "h-full",
+      ty: ""
+    },
+    bordered: {
+      true: "border-2 border-bb-sec"
     },
   },
   defaultVariants: {
     type: "default",
     size: "md",
+    bordered: true,
   },
 });
 
@@ -38,7 +34,7 @@ export interface BouncyButtonProps extends BButtonVariants {
   className?: string; //for override
 }
 
-function BouncyButton({children, onClick, type, size, className}:BouncyButtonProps){  
+function BouncyButton({children, onClick, type, size, bordered, className}:BouncyButtonProps){  
   function clickHandler(){
     if(typeof onClick === "function"){
       onClick();
@@ -48,7 +44,7 @@ function BouncyButton({children, onClick, type, size, className}:BouncyButtonPro
   return(
     <button
       onClick={clickHandler}
-      className={bButtonStyles({type, size, className})}>
+      className={bButtonStyles({type, size, className, bordered})}>
       {children}
     </button>
   );

@@ -91,7 +91,7 @@ function BBBasket() {
     <div className="flex h-full flex-col bg-amber-500">
       {isPicking ? (
         <>
-          <div className="flex-grow-0 pt-4 px-2 bg-neutral-500">
+          <div className="flex-grow-0 pt-4 px-2 bg-bb-prim">
             <BBItemSearch onAddAction={handleAddItem} />
           </div>
 
@@ -116,42 +116,42 @@ function BBBasket() {
             )}
           </div>
 
-          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-neutral-100 py-2">
+          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-bb-prim py-2">
             {/*TODO: REFACTOR OWN COMPONENT BUTTONS - REPETITIVE CODE*/}
-            <button
+            <BouncyButton
               onClick={handleEmptyBasket}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none border`}
-              aria-label="Empty basket"
+              type="texticon"
+              size="sm"
             >
-              <Trash2 className="flex-shrink-0 text-gray-700" />
-              <span className="text-xs font-medium text-gray-700">
+              <Trash2 className="flex-shrink-0 text-bb-red" />
+              <span className="text-xs font-medium text-bb-prim">
                 Empty Basket
               </span>
-            </button>
+            </BouncyButton>
 
-            <button
+            <BouncyButton
               onClick={handleRemoveUnpicked}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none border`}
-              aria-label="Empty basket"
+              type="texticon"
+              size="sm"
             >
-              <Trash className="flex-shrink-0 text-gray-700" />
-              <span className="text-xs font-medium text-gray-700">
+              <Trash className="flex-shrink-0 text-bb-red" />
+              <span className="text-xs font-medium text-bb-prim">
                 Remove Unpicked
               </span>
-            </button>
+            </BouncyButton>
 
-            <button
+            <BouncyButton
               onClick={handleDonePicking}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none border`}
-              aria-label="Empty basket"
+              type="texticon"
+              size="sm"
             >
-              <ShoppingCart className="flex-shrink-0 text-gray-700" />
-              <span className="text-xs font-medium text-gray-700">
+              <ShoppingCart className="flex-shrink-0 text-bb-green" />
+              <span className="text-xs font-medium text-bb-prim">
                 Done Picking
               </span>
-            </button>
+            </BouncyButton>
 
-            <BouncyButton size="sm">
+            <BouncyButton size="sm" type="icononly">
               <Funnel className="flex-shrink-0 text-gray-700" size={45} strokeWidth={1.5}/>
             </BouncyButton>
           </div>

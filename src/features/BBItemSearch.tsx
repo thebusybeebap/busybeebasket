@@ -10,6 +10,7 @@ import ShopItemDetails from "../components/ShopItemDetails";
 import BarcodeScanner from "../components/BarcodeScanner";
 import { PackageSearch, Plus, Settings, SquarePlus } from "lucide-react";
 import toast from "react-hot-toast";
+import BouncyButton from "../components/ui/BouncyButton.js";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
@@ -158,9 +159,9 @@ function BBItemSearch({
   return (
     <>
       
-      <div className="flex w-full flex-1 gap-1 p-2 bg-neutral-500">
+      <div className="flex w-full flex-1 gap-1 p-2 bg-bb-prim">
 
-        <div className="flex flex-1 flex-col gap-2 p-2 bg-neutral-100">
+        <div className="flex flex-1 flex-col gap-2 p-2 bg-bb-base border-2 border-bb-sec">
 
           <div className="flex-1">
             <BBAutocomplete<Shop>
@@ -192,14 +193,14 @@ function BBItemSearch({
 
         <div className="flex h-auto flex-col gap-1">
           <div className="flex-2/5 pr-1">
-            <button className="float-right cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50">
-              <Settings size={25} strokeWidth={1.5} onClick={()=>{}} />
-            </button>
+            <BouncyButton type="icononly" size="ty" onClick={()=>{}}>
+              <Settings size={25} strokeWidth={1.5}/>
+            </BouncyButton>
           </div>
           <div className="flex-3/5">
-            <button className="cursor-pointer rounded-lg text-gray-700 transition-all hover:bg-gray-200 active:scale-90 active:opacity-50 border-3 h-full">
-              <Plus size={45} strokeWidth={1.5} onClick={handleAddAction}/>
-            </button>
+            <BouncyButton type="icononly" size="tl" onClick={handleAddAction}>
+              <Plus size={45} strokeWidth={1.5} className="text-bb-prim"/>
+            </BouncyButton>
           </div>
         </div>
 
