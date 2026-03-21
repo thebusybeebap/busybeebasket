@@ -1,7 +1,7 @@
 import { tv, type VariantProps } from 'tailwind-variants';
 
 export const bButtonStyles = tv({
-  base: "active:bg-bb-sec bg-bb-base hover:bg-bb-sec active:opacity-50 transition-all active:scale-90 cursor-pointer touch-manipulation rounded-lg select-none",
+  base: "active:bg-bb-sec bg-bb-base hover:bg-bb-sec active:opacity-50 transition-all active:scale-90 cursor-pointer touch-manipulation rounded-lg select-none border-2 border-bb-sec",
   variants: {
     type: {
       default: "",
@@ -13,10 +13,7 @@ export const bButtonStyles = tv({
       md: "px-4 py-2 text-base",
       lg: "px-6 py-3 text-lg",
       tl: "h-full",
-      ty: ""
-    },
-    bordered: {
-      true: "border-2 border-bb-sec"
+      ty: "h-fit"
     },
   },
   defaultVariants: {
@@ -34,7 +31,7 @@ export interface BouncyButtonProps extends BButtonVariants {
   className?: string; //for override
 }
 
-function BouncyButton({children, onClick, type, size, bordered, className}:BouncyButtonProps){  
+function BouncyButton({children, onClick, type, size, className}:BouncyButtonProps){  
   function clickHandler(){
     if(typeof onClick === "function"){
       onClick();
@@ -44,7 +41,7 @@ function BouncyButton({children, onClick, type, size, bordered, className}:Bounc
   return(
     <button
       onClick={clickHandler}
-      className={bButtonStyles({type, size, className, bordered})}>
+      className={bButtonStyles({type, size, className})}>
       {children}
     </button>
   );

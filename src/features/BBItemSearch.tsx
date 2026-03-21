@@ -8,7 +8,7 @@ import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import BarcodeScanner from "../components/BarcodeScanner";
-import { PackageSearch, Plus, Settings, SquarePlus } from "lucide-react";
+import { DatabaseSearch, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import BouncyButton from "../components/ui/BouncyButton.js";
 
@@ -16,8 +16,10 @@ import BouncyButton from "../components/ui/BouncyButton.js";
 
 function BBItemSearch({
   onAddAction,
+  onExploreAction,
 }: {
   onAddAction: (searchedItem: ShopItem) => void;
+  onExploreAction: () => void;
 }) {
   let [selectedShop, setSelectedShop] = useState<Shop>();
   let { fetchShopsByNameQuery, createShop } = useShop();
@@ -49,6 +51,10 @@ function BBItemSearch({
     if (selectedItem) {
       onAddAction(selectedItem);
     }
+  }
+
+  function handleExploreAction() {
+    onExploreAction();
   }
 
   //SHOP
@@ -193,8 +199,8 @@ function BBItemSearch({
 
         <div className="flex h-auto flex-col gap-1">
           <div className="flex-2/5 pr-1">
-            <BouncyButton type="icononly" size="ty" onClick={()=>{}}>
-              <Settings size={25} strokeWidth={1.5}/>
+            <BouncyButton type="icononly" size="ty" onClick={handleExploreAction}>
+              <DatabaseSearch size={25} strokeWidth={1.5}/>
             </BouncyButton>
           </div>
           <div className="flex-3/5">

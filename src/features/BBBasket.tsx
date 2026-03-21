@@ -6,7 +6,7 @@ import { BASKET_ITEM_STATUS } from "../services/bbddb";
 import useBasketItem from "../hooks/useBasketItem";
 import {
   ArchiveX,
-  Funnel,
+  Settings2,
   ShoppingBasket,
   ShoppingCart,
   Trash,
@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import BagList from "../components/Bag/BagList";
 import BouncyButton from "../components/ui/BouncyButton";
+
+//replace source of list data depends on the mode?
 
 function BBBasket() {
   let {
@@ -46,7 +48,7 @@ function BBBasket() {
         updateBasketItemStatus(id, BASKET_ITEM_STATUS.UNPICKED);
       } else if (itemToCheck?.status === BASKET_ITEM_STATUS.UNPICKED) {
         updateBasketItemStatus(id, BASKET_ITEM_STATUS.PICKED);
-      }
+      } //TODO: BETTER HANDLING OF THIS SWITCHING OF DATA SOURCE FOR THE LIST, AND THEN HANDLE FILTERING, THE EXPLORE/SEARCHDB SHOULD BE UNRELATED TO THIS AS IT WOULD BE A DIFFERENT PAGE
     }
   }
 
@@ -82,6 +84,10 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
+  function openRecordManagement(){
+    return;
+  }
+
   //TODO:DONE Suggestion Details, BugFix and UI
   //TODO:DONE Edit Price function
   //TODO: Shop Record Management(Edit Name, Delete Shop, etc)
@@ -92,7 +98,7 @@ function BBBasket() {
       {isPicking ? (
         <>
           <div className="flex-grow-0 pt-4 px-2 bg-bb-prim">
-            <BBItemSearch onAddAction={handleAddItem} />
+            <BBItemSearch onAddAction={handleAddItem} onExploreAction={openRecordManagement} />
           </div>
 
           <div className="flex-grow-1 overflow-x-hidden overflow-y-auto bg-neutral-100 px-4">
@@ -151,8 +157,8 @@ function BBBasket() {
               </span>
             </BouncyButton>
 
-            <BouncyButton size="sm" type="icononly">
-              <Funnel className="flex-shrink-0 text-gray-700" size={45} strokeWidth={1.5}/>
+            <BouncyButton size="ty" type="icononly">
+              <Settings2 className="flex-shrink-0 text-gray-700" size={25} strokeWidth={1.5}/>
             </BouncyButton>
           </div>
         </>
@@ -208,28 +214,32 @@ function BBBasket() {
               <BagList basket={liveBasket} removeItem={handleRemoveItem} />
             </>
           )}
-          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-neutral-100 pt-2">
-            <button
+          <div className="mt-auto flex justify-center gap-2 border-t-1 bg-bb-prim py-2">
+            <BouncyButton
               onClick={handleEmptyBag}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
-              aria-label="Empty basket"
+              type="texticon"
+              size="sm"
             >
-              <ArchiveX className="flex-shrink-0 text-gray-700" />
-              <span className="text-xs font-medium text-gray-700">
+              <ArchiveX className="flex-shrink-0 text-bb-red" />
+              <span className="text-xs font-medium text-bb-prim">
                 Empty Bag
               </span>
-            </button>
+            </BouncyButton>
 
-            <button
+            <BouncyButton
               onClick={handlePickMore}
-              className={`inline-flex cursor-pointer touch-manipulation flex-col items-center justify-center gap-1 rounded-lg px-3 py-1 transition-all hover:bg-gray-200 active:scale-90 active:ring-2 active:ring-gray-200 active:outline-none`}
-              aria-label="Empty basket"
+              type="texticon"
+              size="sm"
             >
-              <ShoppingBasket className="flex-shrink-0 text-gray-700" />
-              <span className="text-xs font-medium text-gray-700">
+              <ShoppingBasket className="flex-shrink-0 text-bb-green" />
+              <span className="text-xs font-medium text-bb-prim">
                 Pick More Items
               </span>
-            </button>
+            </BouncyButton>
+
+            <BouncyButton size="sm" type="icononly">
+              <Settings2 className="flex-shrink-0 text-gray-700" size={45} strokeWidth={1.5}/>
+            </BouncyButton>
           </div>
         </div>
       )}
