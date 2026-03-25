@@ -41,6 +41,7 @@ function BouncyButton({children, onClick, type, size, className}:BouncyButtonPro
   return(
     <button
       onClick={clickHandler}
+      //onMouseDown={clickHandler} //better implemnentation if framerMotion is in use
       className={bButtonStyles({type, size, className})}>
       {children}
     </button>

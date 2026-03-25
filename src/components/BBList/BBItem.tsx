@@ -96,7 +96,7 @@ function BBItem({
   return (
     <li
       className={
-        "group flex bg-neutral-100 py-2 wrap-anywhere sm:border-y-1 " +
+        "group flex border-t-4 border-bb-off-l bg-bb-base py-2 wrap-anywhere sm:border-y-1 " +
         (isDragging ? " relative z-50 bg-neutral-100 shadow-xl/30" : "")
       }
       style={style}

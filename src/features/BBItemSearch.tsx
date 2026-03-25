@@ -164,7 +164,6 @@ function BBItemSearch({
 
   return (
     <>
-      
       <div className="flex w-full flex-1 gap-1 p-2 bg-bb-prim">
 
         <div className="flex flex-1 flex-col gap-2 p-2 bg-bb-base border-2 border-bb-sec">

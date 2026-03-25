@@ -7,7 +7,7 @@ function App() {
   //Wouter for simple routing of item/shop management pages https://github.com/molefrog/wouter
   return (
     <>
-      <div className="h-dvh bg-neutral-100 touch-manipulation ">
+      <div className="h-dvh bg-neutral-100 touch-manipulation">
         <BBBasket />
       </div>
       <Toaster position="top-right" />

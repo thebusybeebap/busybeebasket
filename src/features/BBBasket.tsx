@@ -31,6 +31,17 @@ function BBBasket() {
     deleteBaggedItems,
   } = useBasketItem();
 
+  let listCount = liveBasket.reduce((count, item) => 
+      item.status !== BASKET_ITEM_STATUS.BAGGED ? count + 1 : count, 0);
+
+  let basketCount = liveBasket.reduce((count, item) =>
+      item.status === BASKET_ITEM_STATUS.BAGGED ? count + 1 : count, 0);
+
+  let unpickedCount = liveBasket.reduce((count, item) => 
+      item.status === BASKET_ITEM_STATUS.UNPICKED ? count + 1 : count, 0);
+
+  let baggedItemsTotalPrice = liveBasket.reduce((total, item) => item.status === BASKET_ITEM_STATUS.BAGGED ? total + (item.price ?? 0) : total, 0);
+
   let [isPicking, setIsPicking] = useState(true);
 
   function handleAddItem(itemToAdd: ShopItem) {
@@ -48,7 +59,7 @@ function BBBasket() {
         updateBasketItemStatus(id, BASKET_ITEM_STATUS.UNPICKED);
       } else if (itemToCheck?.status === BASKET_ITEM_STATUS.UNPICKED) {
         updateBasketItemStatus(id, BASKET_ITEM_STATUS.PICKED);
-      } //TODO: BETTER HANDLING OF THIS SWITCHING OF DATA SOURCE FOR THE LIST, AND THEN HANDLE FILTERING, THE EXPLORE/SEARCHDB SHOULD BE UNRELATED TO THIS AS IT WOULD BE A DIFFERENT PAGE
+      }
     }
   }
 
@@ -84,6 +95,10 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
+  function handleListOptions(){
+    return;
+  }
+
   function openRecordManagement(){
     return;
   }
@@ -93,7 +108,133 @@ function BBBasket() {
   //TODO: Shop Record Management(Edit Name, Delete Shop, etc)
   //TODO: Item Record Management(Edit Name, Delete Item/ShopItem, etc)
 
-  return (
+  return(
+    <div className="h-full grid grid-rows-[auto_1fr_auto_auto]">
+      <div className="bg-bb-prim">
+        {isPicking ? 
+          <BBItemSearch onAddAction={handleAddItem} onExploreAction={openRecordManagement} /> 
+          : null}
+      </div>
+
+      <div className="overflow-x-hidden overflow-y-auto bg-bb-sec">
+        {isPicking && listCount === 0 || !isPicking && basketCount === 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <div className="rounded-lg border-4 border-dashed p-10 text-xl opacity-20">
+              {isPicking ? "Your List is Empty" : "Your Basket is Empty"}
+            </div>
+          </div>
+        ) : (
+          isPicking ? 
+            <BBList
+              liveBasket={liveBasket}
+              removeItem={handleRemoveItem}
+              checkItem={handleItemCheck}
+              reOrderItems={handleItemReorder}
+            /> :
+            <BagList basket={liveBasket} removeItem={handleRemoveItem} />
+        )}
+      </div>
+
+      {isPicking && unpickedCount !== 0 || !isPicking && basketCount !== 0 ?
+        <div className="bg-bb-off-l border-y-2 border-t-bb-sec border-b-bb-prim-l">
+          <div className="flex px-2 py-1">
+            <div className="flex-1">
+              <span className="font-medium text-bb-prim p-1">
+                {isPicking ? 
+                  unpickedCount + " item(s) left" :
+                  basketCount + " Items"
+                }
+              </span>
+            </div>
+            <div className="ml-auto">
+              {isPicking ? null :
+                <span className="font-medium p-1">
+                  &#8369; { " " + baggedItemsTotalPrice.toFixed(2)}
+                </span>}
+            </div>
+          </div>
+        </div> : 
+        null
+      }
+
+      <div className="bg-bb-prim flex flex-row gap-1 p-2">
+          <div className="flex-1 grid grid-flow-col auto-cols-fr justify-center gap-1">
+              {isPicking ? <>
+                <BouncyButton
+                      onClick={handleEmptyBasket}
+                      type="texticon"
+                      size="sm"
+                >
+                  <Trash2 className="flex-shrink-0 text-bb-red" />
+                  <span className="text-xs font-medium text-bb-prim">
+                    Empty List
+                  </span>
+                </BouncyButton>
+
+                <BouncyButton
+                  onClick={handleDonePicking}
+                  type="texticon"
+                  size="sm"
+                  //key="done-picking-btn" //prevents the action leak on rerender issue, commented for accisdental animated side-effect
+                >
+                  <ShoppingCart className="flex-shrink-0 text-bb-green" />
+                  <span className="text-xs font-medium text-bb-prim">
+                    Done Picking
+                  </span>
+                </BouncyButton>
+              </>: 
+              <>
+                <BouncyButton
+                    onClick={handleEmptyBag}
+                    type="texticon"
+                    size="sm"
+                  >
+                    <ArchiveX className="flex-shrink-0 text-bb-red" />
+                    <span className="text-xs font-medium text-bb-prim">
+                      Empty Basket
+                    </span>
+                </BouncyButton>
+
+                <BouncyButton
+                  onClick={handlePickMore}
+                  type="texticon"
+                  size="sm"
+                  //key="pick-more-btn" //prevents the action leak on rerender issue, commented for accisdental animated side-effect
+                >
+                  <ShoppingBasket className="flex-shrink-0 text-bb-green" />
+                  <span className="text-xs font-medium text-bb-prim">
+                    Pick More Items
+                  </span>
+                </BouncyButton>
+              </>}
+          </div>
+          <div className="ml-auto">
+            <BouncyButton size="ty" type="icononly">
+              <Settings2 className="flex-shrink-0 text-gray-700" size={25} strokeWidth={1.5}/>
+            </BouncyButton>
+          </div>
+      </div>
+
+    </div>
+  );
+}
+export default BBBasket;
+
+/*
+<BouncyButton
+  onClick={handleRemoveUnpicked}
+  type="texticon"
+  size="sm"
+>
+  <Trash className="flex-shrink-0 text-bb-red" />
+  <span className="text-xs font-medium text-bb-prim">
+    Remove Unpicked
+  </span>
+</BouncyButton>
+*/
+
+
+/*return (
     <div className="flex h-full flex-col bg-amber-500">
       {isPicking ? (
         <>
@@ -123,7 +264,6 @@ function BBBasket() {
           </div>
 
           <div className="mt-auto flex justify-center gap-2 border-t-1 bg-bb-prim py-2">
-            {/*TODO: REFACTOR OWN COMPONENT BUTTONS - REPETITIVE CODE*/}
             <BouncyButton
               onClick={handleEmptyBasket}
               type="texticon"
@@ -244,6 +384,4 @@ function BBBasket() {
         </div>
       )}
     </div>
-  );
-}
-export default BBBasket;
+  );*/
