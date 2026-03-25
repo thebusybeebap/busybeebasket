@@ -16,3 +16,9 @@
   --color-bb-green: oklch(0.5265 0.132 154.29);
   --color-bb-green-l: oklch(0.6976 0.1359 154.67);
 }
+
+@layer base {
+  html, body {
+    @apply overscroll-y-none;
+  }
+}
