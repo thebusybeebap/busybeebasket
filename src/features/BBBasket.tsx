@@ -9,7 +9,7 @@ import {
   Settings2,
   ShoppingBasket,
   ShoppingCart,
-  Trash,
+  //Trash,
   Trash2,
 } from "lucide-react";
 import BagList from "../components/Bag/BagList";
@@ -25,7 +25,7 @@ function BBBasket() {
     itemReorder,
     updateBasketItemStatus,
     emptyBasket,
-    deleteUnpickedItems,
+    //deleteUnpickedItems,
     //deletePickedItems,
     bagPickedItems,
     deleteBaggedItems,
@@ -72,9 +72,9 @@ function BBBasket() {
     bagPickedItems();
   }
 
-  function handleRemoveUnpicked() {
+  /*function handleRemoveUnpicked() {
     deleteUnpickedItems();
-  }
+  }*/
 
   function handleEmptyBasket() {
     //if (
@@ -95,9 +95,9 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
-  function handleListOptions(){
+  /*function handleListOptions(){
     return;
-  }
+  }*/
 
   function openRecordManagement(){
     return;
