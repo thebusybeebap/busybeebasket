@@ -4,23 +4,36 @@ import { PersistItems } from "../services/Items.js";
 import useShop from "../hooks/useShop";
 import useShopItem from "../hooks/useShopItem";
 
-import { Shop, ShopItem } from "../data/models";
+import { Item, Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import BarcodeScanner from "../components/BarcodeScanner";
-import { DatabaseSearch, Plus } from "lucide-react";
+import { DatabaseSearch, Plus, X } from "lucide-react";
 import toast from "react-hot-toast";
 import BouncyButton from "../components/ui/BouncyButton.js";
+import { useLocation } from "wouter";
 
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
+interface BBItemSearchProps {
+  onSelectItemAction: (searchedItem: ShopItem|Item|undefined) => void;
+  onExploreAction?: () => void;
+  onSelectShopAction?: (searchedShop: Shop|undefined) => void;
+  buttonMode?: boolean;
+}
+
 function BBItemSearch({
-  onAddAction,
+  onSelectItemAction,
   onExploreAction,
-}: {
-  onAddAction: (searchedItem: ShopItem) => void;
-  onExploreAction: () => void;
-}) {
+  onSelectShopAction,
+  buttonMode = true,
+}: BBItemSearchProps) {
+//TODO: MAYBE JUST REMOVE THE SEARCH BUTTONS AND AUTO DISPLAY DETAILS ON SELECT. This actually introduces unnecessary code cohession so it needs to be refactored later on to remove that. maybe pass a "mode"/"currentpage" instead
+//isButtonMode
+//in handleShopSelect at end if inRepo auto-call onSelectShopAction
+//in handleItemSelect AND handleCreateNewItem at end if inRepo auto-call onSelectItemAction
+
+
   let [selectedShop, setSelectedShop] = useState<Shop>();
   let { fetchShopsByNameQuery, createShop } = useShop();
   let [shopSearchValue, setShopSearchValue] = useState("");
@@ -31,6 +44,9 @@ function BBItemSearch({
     fetchItemsInAllShopsByNameQuery,
     createShopItem,
   } = useShopItem();
+  const [location, navigate] = useLocation();
+
+  let notHome = location != "/"; //TODO: inRepo instead??
 
   async function setItemSearchValueByBarcode(scannedBarcode: string) {
     let scannedItem = await PersistItems.getItemByBarcode(scannedBarcode);
@@ -49,12 +65,18 @@ function BBItemSearch({
 
   function handleAddAction() {
     if (selectedItem) {
-      onAddAction(selectedItem);
+      onSelectItemAction(selectedItem);
     }
   }
 
+  function handleBackToHome(){
+    navigate('/');
+  }
+
   function handleExploreAction() {
-    onExploreAction();
+    if(typeof onExploreAction === 'function') {
+      onExploreAction();
+    }
   }
 
   //SHOP
@@ -69,11 +91,18 @@ function BBItemSearch({
           //onSearchDone(undefined);
         }
       }
+
+      if(buttonMode === false && typeof onSelectShopAction === 'function'){
+        onSelectShopAction(shop);
+      }
     } else {
       setSelectedShop(undefined);
       setShopSearchValue("");
       setSelectedItem(undefined); //TODO: Update that item only "clears" if item does not exist in shop
       setItemSearchValue("");
+      if(buttonMode === false && typeof onSelectShopAction === 'function'){
+        onSelectShopAction(undefined);
+      }
     }
   }
 
@@ -119,12 +148,19 @@ function BBItemSearch({
         setShopSearchValue(shopFromSelectedItem.name); // do this for shop select also, clear item if item is not in selected shop
         // search value on autocomplete component
       }
+
+      if(buttonMode === false && typeof onSelectItemAction === 'function'){
+        onSelectItemAction(item);
+      }
     } else {
       setSelectedItem(undefined); //when does this happen?? when is the selectedItem state cleared? check
+      if(buttonMode === false && typeof onSelectItemAction === 'function'){
+        onSelectItemAction(undefined);
+      }
     }
   }
 
-  async function handleCreateNewItem<ShopItem>(name: string) {
+  async function handleCreateNewItem<ShopItem>(name: string) { 
     let newShopItem;
 
     let shopId = selectedShop?.id;
@@ -135,6 +171,9 @@ function BBItemSearch({
     }
 
     setSelectedItem(newShopItem);
+    if(buttonMode === false && typeof onSelectItemAction === 'function'){
+      onSelectItemAction(newShopItem);
+    }
     return newShopItem as ShopItem;
   }
 
@@ -168,16 +207,16 @@ function BBItemSearch({
 
         <div className="flex flex-1 flex-col gap-2 p-2 bg-bb-base border-2 border-bb-sec">
 
-          <div className="flex-1">
-            <BBAutocomplete<Shop>
-              suggestionsFunction={getShopSuggestions}
-              selected={selectedShop}
-              onSelect={handleShopSelect}
-              onCreateNew={handleCreateNewShop}
-              placeHolder="Search Shop"
-              searchValue={shopSearchValue}
-              updateSearchValue={setShopSearchValue}
-            />
+          <div className="flex flex-1 gap-1">
+              <BBAutocomplete<Shop>
+                suggestionsFunction={getShopSuggestions}
+                selected={selectedShop}
+                onSelect={handleShopSelect}
+                onCreateNew={handleCreateNewShop}
+                placeHolder="Search Shop"
+                searchValue={shopSearchValue}
+                updateSearchValue={setShopSearchValue}
+              />
           </div>
 
           <div className="flex gap-1 flex-1">
@@ -198,14 +237,21 @@ function BBItemSearch({
 
         <div className="flex h-auto flex-col gap-1">
           <div className="flex-2/5 pr-1">
-            <BouncyButton type="icononly" size="ty" onClick={handleExploreAction}>
-              <DatabaseSearch size={25} strokeWidth={1.5}/>
-            </BouncyButton>
+            {notHome ?
+              <BouncyButton type="icononly" size="ty" onClick={handleBackToHome}>
+                <X size={25} strokeWidth={1.5} className="text-bb-prim"/>
+              </BouncyButton> :
+              <BouncyButton type="icononly" size="ty" onClick={handleExploreAction}>
+                <DatabaseSearch size={25} strokeWidth={1.5} className="text-bb-prim"/>
+              </BouncyButton>
+            }
           </div>
           <div className="flex-3/5">
-            <BouncyButton type="icononly" size="tl" onClick={handleAddAction}>
-              <Plus size={45} strokeWidth={1.5} className="text-bb-prim"/>
-            </BouncyButton>
+            {buttonMode ?
+              <BouncyButton type="icononly" size="tl" onClick={handleAddAction}>
+                <Plus size={45} className="text-bb-prim"/>
+              </BouncyButton> 
+              : null}
           </div>
         </div>
 
@@ -215,3 +261,33 @@ function BBItemSearch({
 }
 
 export default BBItemSearch;
+
+/*
+
+            <BouncyButton type="icononly" size="ty" onClick={handleShopSearch}>
+              <Search size={35} className="text-bb-prim"/>
+            </BouncyButton>
+
+        <div className="flex h-auto flex-col gap-1">
+          <div className="flex-2/5 pr-1">
+            {notInMain ?
+              <BouncyButton type="icononly" size="ty" onClick={handleBackToMain}>
+                <X size={25} strokeWidth={1.5} className="text-bb-prim"/>
+              </BouncyButton> :
+              <BouncyButton type="icononly" size="ty" onClick={handleExploreAction}>
+                <DatabaseSearch size={25} strokeWidth={1.5} className="text-bb-prim"/>
+              </BouncyButton>
+            }
+          </div>
+          <div className="flex-3/5">
+            {canSearchShop ?
+              <BouncyButton type="icononly" size="tl" onClick={handleShopSearch}>
+                <PackageSearch size={45} className="text-bb-prim"/>
+              </BouncyButton> :
+              <BouncyButton type="icononly" size="tl" onClick={handleAddAction}>
+                <Plus size={45} className="text-bb-prim"/>
+              </BouncyButton>
+            }
+          </div>
+        </div>
+*/

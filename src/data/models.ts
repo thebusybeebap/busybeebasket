@@ -24,6 +24,11 @@ export interface Shop extends BBSearchable {
   id: string; //key
   name: string;
 }
+export interface Item extends BBSearchable {
+  id: string;
+  name: string;
+  barcode?: string;
+}
 
 export interface ShopItem extends BBSearchable {
   id: string; // key: itemId + shopId

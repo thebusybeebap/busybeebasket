@@ -7,6 +7,11 @@ export namespace PersistShops {
     return noneShop;
   }
 
+  export async function fetchShopById(shopId: string) {
+    let shop = await bbbdb.shops.get(shopId);
+    return shop;
+  }
+
   export async function fetchShopsById(shopId: string) {
     let shops = await bbbdb.shops.where("id").anyOf([shopId]).toArray();
     return shops;

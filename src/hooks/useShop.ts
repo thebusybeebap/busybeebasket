@@ -8,6 +8,11 @@ import { matchedSortValue } from "../utils/Utilities";
 function useShop() {
   let [isShopLoading, setIsShopLoading] = useState(false); // could cause problem since shared by multiple functions that could run at the same time
 
+  async function fetchShopById(id: string){
+    let result = await PersistShops.fetchShopById(id);
+    return result;
+  }
+
   async function fetchShopsByNameQuery(nameQuery: string) {
     setIsShopLoading(true);
     let result = await PersistShops.fetchShopsByNameQuery(nameQuery);
@@ -56,7 +61,7 @@ function useShop() {
     }
   }
 
-  return { fetchShopsByNameQuery, createShop, isShopLoading };
+  return { fetchShopById, fetchShopsByNameQuery, createShop, isShopLoading };
 }
 
 export default useShop;

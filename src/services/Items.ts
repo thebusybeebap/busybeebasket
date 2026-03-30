@@ -9,6 +9,11 @@ export namespace PersistItems {
     return items;
   }
 
+  export async function getItemById(ItemId: string) {
+    let item = await bbbdb.items.get(ItemId);
+    return item;
+  }
+
   export async function getItemByBarcode(scannedBarcode: string) {
     let scannedItem = await bbbdb.items.get({ barcode: scannedBarcode });
     return scannedItem;
