@@ -35,10 +35,10 @@ export interface ShopItemPersistStorage {
 
 export interface BasketItemPersistStorage {
   id: string;
-  name: string;
+  name: string; //TODO: might need to remove this once we allow renaming
   shopId: string;
   itemId: string;
-  shopName: string;
+  shopName: string; //TODO: might need to remove this once we allow renaming
   status: BASKET_ITEM_STATUS;
   price: number;
   updatedAt: Date;

@@ -14,6 +14,14 @@ export namespace PersistShopItems {
     return shopItems;
   }
 
+  export async function fetchShopsByItemId(itemId: string) {
+    let shops = await bbbdb.shopItems
+      .where("itemId")
+      .anyOf([itemId])
+      .toArray();
+    return shops;
+  }
+
   export async function updateShopItemPrice(
     itemId: string,
     shopId: string,

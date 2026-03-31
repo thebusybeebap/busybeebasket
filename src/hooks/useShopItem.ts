@@ -14,7 +14,7 @@ import { PersistShopItems } from "../services/ShopItems";
 import { PagingStrategies } from "../utils/PagingStrategies";
 import { matchedSortValue, shopItemMatchedSortValue } from "../utils/Utilities";
 
-function generateShopItems(
+function generateShopItems( //TODO: move to utils
   baseDetailItems: ShopItemPersistStorage[],
   itemDetails: Map<string, ItemPersistStorage>,
   shopDetails: Map<string, ShopPersistStorage>,
@@ -269,9 +269,49 @@ function useShopItem() {
     }
   }
 
+  async function fetchShopsByItemId(id: string){
+    let shopsWithItem = await PersistShopItems.fetchShopsByItemId(id);
+    let shopIds = shopsWithItem.map((shopItem)=>shopItem.shopId);
+    let shops = await PersistShops.fetchShopsById(shopIds);
+    let shopDetails = new Map(
+      shops.map((shop) => [shop.id, shop]),
+    );
+
+    let item = await PersistItems.getItemById(id);
+    let itemDetails = new Map([[id, item as ItemPersistStorage]]);
+
+    let result = generateShopItems(
+      shopsWithItem,
+      itemDetails,
+      shopDetails,
+    );
+    return result;
+  }
+
+  async function fetchItemsByShopId(id: string){
+    let itemsInShop = await PersistShopItems.fetchShopItemsByShopId(id);
+    let itemIds = itemsInShop.map((shopItem)=>shopItem.itemId);
+    let items = await PersistItems.fetchItemsById(itemIds);
+    let itemDetails = new Map(
+      items.map((item) => [item.id, item]),
+    );
+
+    let shop = await PersistShops.fetchShopById(id);
+    let shopDetails = new Map([[id, shop as ShopPersistStorage]]);
+
+    let result = generateShopItems(
+      itemsInShop,
+      itemDetails,
+      shopDetails,
+    );
+    return result;
+  }
+
   return {
     fetchItemsInShopByNameQuery,
     fetchItemsInAllShopsByNameQuery,
+    fetchShopsByItemId,
+    fetchItemsByShopId,
     createShopItem,
     isShopItemLoading,
   };

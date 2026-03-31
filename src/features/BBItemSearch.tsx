@@ -4,7 +4,7 @@ import { PersistItems } from "../services/Items.js";
 import useShop from "../hooks/useShop";
 import useShopItem from "../hooks/useShopItem";
 
-import { Item, Shop, ShopItem } from "../data/models";
+import { Shop, ShopItem } from "../data/models";
 import BBAutocomplete from "../components/BBAutocomplete";
 import ShopItemDetails from "../components/ShopItemDetails";
 import BarcodeScanner from "../components/BarcodeScanner";
@@ -16,7 +16,7 @@ import { useLocation } from "wouter";
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
 interface BBItemSearchProps {
-  onSelectItemAction: (searchedItem: ShopItem|Item|undefined) => void;
+  onSelectItemAction: (searchedItem: ShopItem|undefined) => void;
   onExploreAction?: () => void;
   onSelectShopAction?: (searchedShop: Shop|undefined) => void;
   buttonMode?: boolean;

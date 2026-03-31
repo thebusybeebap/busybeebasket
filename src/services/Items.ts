@@ -14,6 +14,12 @@ export namespace PersistItems {
     return item;
   }
 
+  
+  export async function fetchItemsById(itemIds: string[]) {  
+    let items = await bbbdb.items.where("id").anyOf(itemIds).toArray();
+    return items;
+  }
+
   export async function getItemByBarcode(scannedBarcode: string) {
     let scannedItem = await bbbdb.items.get({ barcode: scannedBarcode });
     return scannedItem;
