@@ -19,6 +19,8 @@ interface BBItemSearchProps {
   onSelectItemAction: (searchedItem: ShopItem|undefined) => void;
   onExploreAction?: () => void;
   onSelectShopAction?: (searchedShop: Shop|undefined) => void;
+  onShopClear?: ()=>void;
+  onItemClear?: ()=>void;
   buttonMode?: boolean;
 }
 
@@ -26,6 +28,8 @@ function BBItemSearch({
   onSelectItemAction,
   onExploreAction,
   onSelectShopAction,
+  onShopClear,
+  onItemClear,
   buttonMode = true,
 }: BBItemSearchProps) {
 //TODO: MAYBE JUST REMOVE THE SEARCH BUTTONS AND AUTO DISPLAY DETAILS ON SELECT. This actually introduces unnecessary code cohession so it needs to be refactored later on to remove that. maybe pass a "mode"/"currentpage" instead
@@ -47,6 +51,13 @@ function BBItemSearch({
   const [location, navigate] = useLocation();
 
   let notHome = location != "/"; //TODO: inRepo instead??
+
+  /*function handleClearSearch(){
+    setSelectedShop(undefined);
+    setShopSearchValue("");
+    setSelectedItem(undefined);
+    setItemSearchValue("");
+  }*/
 
   async function setItemSearchValueByBarcode(scannedBarcode: string) {
     let scannedItem = await PersistItems.getItemByBarcode(scannedBarcode);
@@ -91,18 +102,15 @@ function BBItemSearch({
           //onSearchDone(undefined);
         }
       }
-
-      if(buttonMode === false && typeof onSelectShopAction === 'function'){
-        onSelectShopAction(shop);
-      }
     } else {
       setSelectedShop(undefined);
       setShopSearchValue("");
       setSelectedItem(undefined); //TODO: Update that item only "clears" if item does not exist in shop
       setItemSearchValue("");
-      if(buttonMode === false && typeof onSelectShopAction === 'function'){
-        onSelectShopAction(undefined);
-      }
+    }
+
+    if(buttonMode === false && typeof onSelectShopAction === 'function'){
+        onSelectShopAction(shop);
     }
   }
 
@@ -148,15 +156,12 @@ function BBItemSearch({
         setShopSearchValue(shopFromSelectedItem.name); // do this for shop select also, clear item if item is not in selected shop
         // search value on autocomplete component
       }
-
-      if(buttonMode === false && typeof onSelectItemAction === 'function'){
-        onSelectItemAction(item);
-      }
     } else {
       setSelectedItem(undefined); //when does this happen?? when is the selectedItem state cleared? check
-      if(buttonMode === false && typeof onSelectItemAction === 'function'){
-        onSelectItemAction(undefined);
-      }
+    }
+
+    if(buttonMode === false && typeof onSelectItemAction === 'function'){
+      onSelectItemAction(item);
     }
   }
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import BouncyButton from "../components/ui/BouncyButton";
 import BBItemSearch from "../features/BBItemSearch";
 import { Shop, Item, ShopItem } from "../data/models";
-import { SquareX } from "lucide-react";
+import { SquarePen, SquareX } from "lucide-react";
 import useShopItem from "../hooks/useShopItem";
 
 function Repository(){
@@ -17,11 +17,19 @@ function Repository(){
 
   let {fetchShopsByItemId, fetchItemsByShopId} = useShopItem();
 
+  function clearRecord(){
+    setRecordName("");
+    setRecordSublist([]);
+  }
+
   function handleShopSelect(selectedShop: Shop|undefined){
     setIsRecordItem(false);
     if(selectedShop){
       setRecordName(selectedShop.name);
       fetchItemsByShopId(selectedShop.id).then((items)=>setRecordSublist(items));
+    }
+    else{
+      clearRecord();
     }
   }
 
@@ -30,6 +38,9 @@ function Repository(){
     if(selectedItem){
       setRecordName(selectedItem.name);
       fetchShopsByItemId(selectedItem.itemId).then((shops)=>setRecordSublist(shops));
+    }
+    else{
+      clearRecord();
     }
   }
 
@@ -50,7 +61,7 @@ function Repository(){
   }
 
   function handleRenameShop(){
-
+    //don't allow edit on NONE
   }
 
   return(
@@ -67,7 +78,10 @@ function Repository(){
       {recordName ?
         <>
           <div className="bg-bb-base px-2 py-1">
-            <div className="text-2xl text-bb-prim">{recordName}</div>
+            <div className="grid grid-cols-[1fr_auto]">
+              <span className="text-2xl text-bb-prim">{recordName}</span>
+              <span className="text-bb-prim-l"><SquarePen /></span>
+            </div>
             <div></div>
           </div>
           <div className="bg-bb-base overflow-x-hidden overflow-y-auto px-2">
@@ -76,7 +90,6 @@ function Repository(){
                 <div>Shop</div>
                 <div className="ml-auto">Price</div>
               </li>
-
               {recordSublist.map((record)=>(
                 <li key={record.id}
                     className="grid grid-cols-[6fr_2fr_1fr] gap-2"
@@ -86,7 +99,6 @@ function Repository(){
                   <div className="ml-auto" onClick={()=>handleRemoveItemFromShop()}><SquareX className="text-bb-red" /></div>
                 </li>
               ))}
-              
             </ul>
           </div>
         </> :
@@ -100,10 +112,9 @@ function Repository(){
         </>
       }
       </div>
-      
 
       <div className="bg-bb-prim flex flex-row gap-1 p-2">
-        <BouncyButton>Delete</BouncyButton> <BouncyButton>Clear</BouncyButton>
+        <BouncyButton>Delete</BouncyButton>
       </div>
     </div>
   );
