@@ -13,7 +13,8 @@ export const bButtonStyles = tv({
       md: "px-4 py-2 text-base",
       lg: "px-6 py-3 text-lg",
       tl: "h-full",
-      ty: "h-fit"
+      ty: "h-fit",
+      wd: "w-full px-4 py-2",
     },
   },
   defaultVariants: {
@@ -27,11 +28,12 @@ export type BButtonVariants = VariantProps<typeof bButtonStyles>;
 
 export interface BouncyButtonProps extends BButtonVariants {
   children?: React.ReactNode;
-  onClick?: () => void
+  onClick?: () => void;
+  disabled?: boolean;
   className?: string; //for override
 }
 
-function BouncyButton({children, onClick, type, size, className}:BouncyButtonProps){  
+function BouncyButton({children, disabled=false, onClick, type, size, className}:BouncyButtonProps){  
   function clickHandler(){
     if(typeof onClick === "function"){
       onClick();
@@ -40,6 +42,7 @@ function BouncyButton({children, onClick, type, size, className}:BouncyButtonPro
 
   return(
     <button
+      disabled={disabled}
       onClick={clickHandler}
       //onMouseDown={clickHandler} //better implemnentation if framerMotion is in use
       className={bButtonStyles({type, size, className})}>

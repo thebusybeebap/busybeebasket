@@ -175,7 +175,7 @@ function BBAutocomplete<T extends BBSearchable>({
               key={suggestion.id}
             >
               <section>
-                <span className="text-xl">{suggestion.name}</span>
+                <span className="text-xl wrap-anywhere">{suggestion.name}</span>
               </section>
               {suggestionsDetails ? (
                 <section className="indent-2 text-xs">

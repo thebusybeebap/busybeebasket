@@ -2,7 +2,7 @@ import { useState } from "react";
 import BouncyButton from "../components/ui/BouncyButton";
 import BBItemSearch from "../features/BBItemSearch";
 import { Shop, Item, ShopItem } from "../data/models";
-import { SquarePen, SquareX } from "lucide-react";
+import { SquarePen, SquareX, Trash2 } from "lucide-react";
 import useShopItem from "../hooks/useShopItem";
 
 function Repository(){
@@ -14,12 +14,14 @@ function Repository(){
   //let [recordId, setRecordId] = useState(""); //needed for edit and delete functions?
   let [recordName, setRecordName] = useState("");
   let [recordSublist, setRecordSublist] = useState<ShopItem[]>([]);
+  let [selectedSublistRowId, setSelectedSublistRowId] = useState("");
 
   let {fetchShopsByItemId, fetchItemsByShopId} = useShopItem();
 
   function clearRecord(){
     setRecordName("");
     setRecordSublist([]);
+    setSelectedSublistRowId("");
   }
 
   function handleShopSelect(selectedShop: Shop|undefined){
@@ -42,6 +44,10 @@ function Repository(){
     else{
       clearRecord();
     }
+  }
+
+  function handleSelectSublistRow(id: string){
+    setSelectedSublistRowId(id);
   }
 
   function handleRemoveItemFromShop(){
@@ -77,26 +83,31 @@ function Repository(){
       <div className="bg-bb-sec h-full grid grid-rows-[auto_1fr] p-2 gap-1">
       {recordName ?
         <>
-          <div className="bg-bb-base px-2 py-1">
+          <div className="bg-bb-base border-bb-off border-4 px-2 py-1">
             <div className="grid grid-cols-[1fr_auto]">
-              <span className="text-2xl text-bb-prim">{recordName}</span>
+              <span className="text-2xl font-bold text-bb-prim wrap-anywhere">{recordName}</span>
               <span className="text-bb-prim-l"><SquarePen /></span>
             </div>
             <div></div>
           </div>
-          <div className="bg-bb-base overflow-x-hidden overflow-y-auto px-2">
+          <div className="bg-bb-base border-bb-off border-4 overflow-x-hidden overflow-y-auto px-2">
             <ul>
-              <li className="grid grid-cols-[6fr_2fr_1fr] gap-2">
-                <div>Shop</div>
+              <li className="grid grid-cols-[6fr_2fr_1fr] gap-2 pt-2 font-bold border-b-2 border-bb-off-l">
+                <div>{isRecordItem ? "Item" : "Shop"}</div>
                 <div className="ml-auto">Price</div>
               </li>
               {recordSublist.map((record)=>(
                 <li key={record.id}
-                    className="grid grid-cols-[6fr_2fr_1fr] gap-2"
+                    className={"grid grid-cols-[6fr_2fr_1fr] gap-2 pt-4 " +
+                      (selectedSublistRowId === record.id ? "font-bold" : "")
+                    }
+                    onClick={()=>handleSelectSublistRow(record.id)}
                 >
-                  <div>{isRecordItem ? record.shopName : record.name}</div>
+                  <div className="wrap-anywhere">{isRecordItem ? record.shopName : record.name}</div>
                   <div className="ml-auto">{record.price}</div>
-                  <div className="ml-auto" onClick={()=>handleRemoveItemFromShop()}><SquareX className="text-bb-red" /></div>
+                  <div className="ml-auto" onClick={()=>handleRemoveItemFromShop()}>
+                    <SquareX className={selectedSublistRowId === record.id ? "text-bb-red-l" : "text-bb-prim-l"} />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -114,7 +125,12 @@ function Repository(){
       </div>
 
       <div className="bg-bb-prim flex flex-row gap-1 p-2">
-        <BouncyButton>Delete</BouncyButton>
+        <BouncyButton type="texticon">
+          <Trash2 className={"flex-shrink-0 " + (recordName === "" ? "text-bb-prim-l" : "text-bb-red-l")}/>
+          <span className="text-xs font-medium text-bb-prim-l">
+            Delete Record
+          </span>
+        </BouncyButton>
       </div>
     </div>
   );
