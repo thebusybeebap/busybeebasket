@@ -30,4 +30,37 @@ export namespace PersistShops {
 
     return shops;
   }
+
+  export async function deleteShop(id: string){
+    let shopDeletionResult = await bbbdb.transaction("rw", [bbbdb.basketItems, bbbdb.shops, bbbdb.shopItems], 
+      async () => {
+        let forSoftDelete = await bbbdb.basketItems.where('shopId').equals(id).first();
+        let shop = await bbbdb.shops.get(id);
+        if(shop?.name === "NONE"){
+          throw new Error("ERROR: Not allowed to Delete NONE Shop");
+        }
+        if(forSoftDelete){
+          await bbbdb.shops.update(id, { name: '[DELETED]' + (shop?.name ?? "") , isDeleted: true });
+        }
+        else {
+          await bbbdb.shops.delete(id);
+        }
+        let itemCount = await bbbdb.shopItems.where('shopId').equals(id).delete();
+        return itemCount;
+      });
+    return shopDeletionResult;
+  }
+
+  export async function renameShop(shopId: string, newName: string){
+    let shop = await bbbdb.shops.get(shopId);
+    if(shop?.name === "NONE"){
+      throw new Error("ERROR: Not allowed to Delete NONE Shop");
+    }
+    let shopRenameResult = await bbbdb.transaction("rw", [bbbdb.basketItems, bbbdb.shops, bbbdb.shopItems], 
+      async () => {
+          await bbbdb.shops.update(shopId, { name: newName});
+          await bbbdb.basketItems.where('shopId').equals(shopId).modify({ shopName: newName});
+      });
+    return shopRenameResult;
+  }
 }

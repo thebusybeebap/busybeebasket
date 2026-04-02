@@ -50,7 +50,8 @@ function useShopItem() {
     let emptyArray: ShopItem[] = []; // to rewrite better
     let hasExactMatch = false;
     try {
-      let result = await bbbdb.transaction(
+      //TODO: Rename "result variables with whatever the expected result is"
+      let result = await bbbdb.transaction( //TODO: move this to services, there should be no dexie specific functions inside hooks
         "r",
         [bbbdb.items, bbbdb.shopItems, bbbdb.shops],
         async () => {
@@ -71,6 +72,7 @@ function useShopItem() {
           let selectedShops = await PersistShops.fetchShopsById(shopId);
           if (selectedShops.length === 0) return { emptyArray, hasExactMatch };
 
+          //TODO: Starting here should be outside a transacation already, could start by moving this out first
           let shopDetails = new Map(
             selectedShops.map((shop) => [shop.id, shop]),
           );
@@ -234,6 +236,7 @@ function useShopItem() {
               id: generateId(),
               name: newItemName,
               updatedAt: new Date(Date.now()),
+              isDeleted: false
             });
           }
 
@@ -307,12 +310,19 @@ function useShopItem() {
     return result;
   }
 
+  async function removeItemFromShop(itemId: string, shopId: string){
+    // @ts-expect-error
+    let deletionResult  = await bbbdb.shopItems.delete([shopId,itemId]);
+    return deletionResult;
+  }
+
   return {
     fetchItemsInShopByNameQuery,
     fetchItemsInAllShopsByNameQuery,
     fetchShopsByItemId,
     fetchItemsByShopId,
     createShopItem,
+    removeItemFromShop,
     isShopItemLoading,
   };
 }

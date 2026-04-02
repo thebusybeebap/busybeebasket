@@ -2,31 +2,39 @@ import { useState } from "react";
 import BouncyButton from "../components/ui/BouncyButton";
 import BBItemSearch from "../features/BBItemSearch";
 import { Shop, Item, ShopItem } from "../data/models";
-import { SquarePen, SquareX, Trash2 } from "lucide-react";
+import { Ban, Save, SquarePen, SquareX, Trash2 } from "lucide-react";
 import useShopItem from "../hooks/useShopItem";
+import useShop from "../hooks/useShop";
+import useItem from "../hooks/useItem";
 
 function Repository(){
 
   //TODO: show only delete button if ROW of show OR item IS SELECTED
 
   let [isRecordItem, setIsRecordItem] = useState(true);
+  let [isEditName, setIsEditName] = useState(false);
 
-  //let [recordId, setRecordId] = useState(""); //needed for edit and delete functions?
+  let [recordId, setRecordId] = useState(""); //needed for edit and delete functions?
   let [recordName, setRecordName] = useState("");
   let [recordSublist, setRecordSublist] = useState<ShopItem[]>([]);
   let [selectedSublistRowId, setSelectedSublistRowId] = useState("");
 
-  let {fetchShopsByItemId, fetchItemsByShopId} = useShopItem();
+  let {fetchShopsByItemId, fetchItemsByShopId, removeItemFromShop} = useShopItem();
+  let {deleteShop, renameShop} = useShop();
+  let {deleteItem, renameItem} = useItem();
 
   function clearRecord(){
+    setRecordId("");
     setRecordName("");
     setRecordSublist([]);
     setSelectedSublistRowId("");
   }
 
   function handleShopSelect(selectedShop: Shop|undefined){
+    //TODO: Creating enw shop does not trigger shwoing of record
     setIsRecordItem(false);
     if(selectedShop){
+      setRecordId(selectedShop.id);
       setRecordName(selectedShop.name);
       fetchItemsByShopId(selectedShop.id).then((items)=>setRecordSublist(items));
     }
@@ -38,6 +46,7 @@ function Repository(){
   function handleItemSelect(selectedItem: ShopItem|undefined){
     setIsRecordItem(true);
     if(selectedItem){
+      setRecordId(selectedItem.itemId);
       setRecordName(selectedItem.name);
       fetchShopsByItemId(selectedItem.itemId).then((shops)=>setRecordSublist(shops));
     }
@@ -50,24 +59,35 @@ function Repository(){
     setSelectedSublistRowId(id);
   }
 
-  function handleRemoveItemFromShop(){
-
+  function handleDeleteItem(itemId: string){//removed from all shops, PersistItem and PersistShopItem
+    deleteItem(itemId);
+    clearRecord();
   }
 
-  function handleDeleteItem(){//removed from all shops, PersistItem and PersistShopItem
-
+  function handleDeleteShop(shopId: string){//removed from PersistShop with all PersistShopItems with shop
+    deleteShop(shopId);
+    clearRecord();
   }
 
-  function handleDeleteShop(){//removed from PersistShop with all PersistShopItems with shop
+  function handleRemoveItemFromShop(id: string, itemId: string, shopId: string){
+    removeItemFromShop(itemId, shopId);
+    setRecordSublist((sublist)=>sublist.filter((row)=> row.id !== id ? row : null));
+  }
 
+  function handleEditClick(){
+    setIsEditName(true);
+  }
+  
+  function handleCancelEdit(){
+    setIsEditName(false);
   }
 
   function handleRenameItem(){
-
+    
   }
 
   function handleRenameShop(){
-    //don't allow edit on NONE
+    
   }
 
   return(
@@ -85,8 +105,30 @@ function Repository(){
         <>
           <div className="bg-bb-base border-bb-off border-4 px-2 py-1">
             <div className="grid grid-cols-[1fr_auto]">
-              <span className="text-2xl font-bold text-bb-prim wrap-anywhere">{recordName}</span>
-              <span className="text-bb-prim-l"><SquarePen /></span>
+              {isEditName?
+                <>
+                  <input className="text-2xl font-bold text-bb-prim wrap-anywhere" type="text"/>
+                  <div className="flex">
+                    <Save
+                      onClick={()=>null}
+                      className="cursor-pointer rounded-lg text-bb-green opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50"
+                    />
+                    <Ban
+                      onClick={handleCancelEdit}
+                      className="cursor-pointer rounded-lg text-bb-red opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50"
+                    />
+                  </div>
+                </>:
+                <>
+                  <span className="text-2xl font-bold text-bb-prim wrap-anywhere">{recordName}</span>
+                  <span 
+                    onClick={handleEditClick} 
+                    className="text-bb-prim-l"
+                  >
+                      <SquarePen />
+                  </span>
+                </>
+              }
             </div>
             <div></div>
           </div>
@@ -96,17 +138,17 @@ function Repository(){
                 <div>{isRecordItem ? "Item" : "Shop"}</div>
                 <div className="ml-auto">Price</div>
               </li>
-              {recordSublist.map((record)=>(
-                <li key={record.id}
+              {recordSublist.map((row)=>(
+                <li key={row.id}
                     className={"grid grid-cols-[6fr_2fr_1fr] gap-2 pt-4 " +
-                      (selectedSublistRowId === record.id ? "font-bold" : "")
+                      (selectedSublistRowId === row.id ? "font-bold" : "")
                     }
-                    onClick={()=>handleSelectSublistRow(record.id)}
+                    onClick={()=>handleSelectSublistRow(row.id)}
                 >
-                  <div className="wrap-anywhere">{isRecordItem ? record.shopName : record.name}</div>
-                  <div className="ml-auto">{record.price}</div>
-                  <div className="ml-auto" onClick={()=>handleRemoveItemFromShop()}>
-                    <SquareX className={selectedSublistRowId === record.id ? "text-bb-red-l" : "text-bb-prim-l"} />
+                  <div className="wrap-anywhere">{isRecordItem ? row.shopName : row.name}</div>
+                  <div className="ml-auto">{row.price}</div>
+                  <div className="ml-auto" onClick={()=>handleRemoveItemFromShop(row.id, row.itemId, row.shopId)}>
+                    <SquareX className={selectedSublistRowId === row.id ? "text-bb-red-l" : "text-bb-prim-l"} />
                   </div>
                 </li>
               ))}
@@ -125,10 +167,13 @@ function Repository(){
       </div>
 
       <div className="bg-bb-prim flex flex-row gap-1 p-2">
-        <BouncyButton type="texticon">
+        <BouncyButton 
+          type="texticon"
+          onClick={isRecordItem ? ()=>handleDeleteItem(recordId) : ()=>handleDeleteShop(recordId)}
+        >
           <Trash2 className={"flex-shrink-0 " + (recordName === "" ? "text-bb-prim-l" : "text-bb-red-l")}/>
           <span className="text-xs font-medium text-bb-prim-l">
-            Delete Record
+            {"Delete " + (isRecordItem ? "Item" : "Shop")} 
           </span>
         </BouncyButton>
       </div>

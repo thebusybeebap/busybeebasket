@@ -13,10 +13,10 @@ export function generateId() {
 
 // persist layer data models
 export interface ShopPersistStorage {
-  //naming convention for Interface from 'db'
   id: string;
   name: string;
   updatedAt: Date;
+  isDeleted?: boolean;
 }
 
 export interface ItemPersistStorage {
@@ -24,6 +24,7 @@ export interface ItemPersistStorage {
   name: string;
   barcode?: string;
   updatedAt: Date;
+  isDeleted?: boolean;
 }
 
 export interface ShopItemPersistStorage {
@@ -58,7 +59,7 @@ bbbdb.version(1).stores({
   shops: "&id, &name, updatedAt",
   items: "&id, &name, &barcode, updatedAt",
   shopItems: "&[shopId+itemId], shopId, itemId, updatedAt",
-  basketItems: "&id, [shopId+itemId], itemId, status, position",
+  basketItems: "&id, [shopId+itemId], itemId, shopId, status, position",
 });
 
 bbbdb.on("populate", function (transaction) {

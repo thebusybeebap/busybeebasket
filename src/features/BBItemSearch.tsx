@@ -124,6 +124,10 @@ function BBItemSearch({
     setSelectedItem(undefined); //why does this not triger rerender for item input?
     setItemSearchValue(""); //why does this not triger rerender for item input?
 
+    if(buttonMode === false && typeof onSelectShopAction === 'function'){
+        onSelectShopAction(newShop);
+    }
+
     return newShop as Shop;
   }
 

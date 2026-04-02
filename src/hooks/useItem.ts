@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PersistItems } from "../services/Items";
 
-function useShop(){
+function useItem(){
   let [isItemLoading, setIsItemLoading] = useState(false);
 
   async function fetchItemById(id: string) {
@@ -11,7 +11,17 @@ function useShop(){
     return result;
   }
 
-  return { fetchItemById, isItemLoading};
+  async function deleteItem(id: string){
+    let result = await PersistItems.deleteItem(id);
+    return result;
+  }
+
+  async function renameItem(itemId: string, newName: string){
+    let result = await PersistItems.renameItem(itemId, newName);
+    return result;
+  }
+
+  return { fetchItemById, deleteItem, renameItem, isItemLoading};
 }
 
-export default useShop;
+export default useItem;

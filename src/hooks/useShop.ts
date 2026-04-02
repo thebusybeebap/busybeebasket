@@ -61,7 +61,17 @@ function useShop() {
     }
   }
 
-  return { fetchShopById, fetchShopsByNameQuery, createShop, isShopLoading };
+  async function deleteShop(id: string){
+    let result = await PersistShops.deleteShop(id);
+    return result;
+  }
+
+  async function renameShop(shopId: string, newName: string){
+    let result = await PersistShops.renameShop(shopId, newName);
+    return result;
+  }
+
+  return { fetchShopById, fetchShopsByNameQuery, createShop, deleteShop, renameShop, isShopLoading };
 }
 
 export default useShop;
