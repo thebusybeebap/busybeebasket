@@ -17,6 +17,7 @@ function useItem(){
   }
 
   async function renameItem(itemId: string, newName: string){
+    newName = newName.trim();
     let result = await PersistItems.renameItem(itemId, newName);
     return result;
   }

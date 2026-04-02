@@ -54,7 +54,7 @@ export namespace PersistShops {
   export async function renameShop(shopId: string, newName: string){
     let shop = await bbbdb.shops.get(shopId);
     if(shop?.name === "NONE"){
-      throw new Error("ERROR: Not allowed to Delete NONE Shop");
+      throw new Error("ERROR: Not allowed to Rename NONE Shop");
     }
     let shopRenameResult = await bbbdb.transaction("rw", [bbbdb.basketItems, bbbdb.shops, bbbdb.shopItems], 
       async () => {

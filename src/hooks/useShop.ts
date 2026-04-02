@@ -67,6 +67,7 @@ function useShop() {
   }
 
   async function renameShop(shopId: string, newName: string){
+    newName = newName.trim();
     let result = await PersistShops.renameShop(shopId, newName);
     return result;
   }
