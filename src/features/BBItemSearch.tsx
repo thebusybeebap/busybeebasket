@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import BouncyButton from "../components/ui/BouncyButton.js";
 import { useLocation } from "wouter";
 
+//TODO: suggestions search overflow scroll list not entire page
 //TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
 interface BBItemSearchProps {

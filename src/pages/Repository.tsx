@@ -8,6 +8,7 @@ import useShop from "../hooks/useShop";
 import useItem from "../hooks/useItem";
 
 function Repository(){
+  //TODO: list overflow scroll
 
   let recordNameInputRef = useRef<HTMLInputElement>(null);
   let [isRecordItem, setIsRecordItem] = useState(true);
@@ -129,7 +130,7 @@ function Repository(){
           />
       </div>
 
-      <div className="bg-bb-sec h-full grid grid-rows-[auto_1fr] p-2 gap-1">
+      <div className="bg-bb-sec h-full overflow-scroll grid grid-rows-[auto_1fr] p-2 gap-1">
       {recordName ?
         <>
           <div className="bg-bb-base border-bb-off border-4 px-2 py-1">
@@ -138,12 +139,12 @@ function Repository(){
                 <>
                   <input
                     ref={recordNameInputRef}
-                    className="text-2xl font-bold text-bb-prim wrap-anywhere outline-1 box-border px-2 rounded-md focus:ring-2 focus:ring-bb-sec focus:outline-none"
+                    className="min-w-0 text-2xl font-bold text-bb-prim outline-1 box-border px-2 rounded-md focus:ring-2 focus:ring-bb-sec focus:outline-none"
                     type="text"
                     autoFocus
                     defaultValue={recordName}
                   />
-                  <div className="flex gap-1">
+                  <div className="grid grid-cols-2 gap-1">
                     <Save size={30}
                       onClick={isRecordItem ? ()=>handleRenameItem() : ()=>handleRenameShop()}
                       className="cursor-pointer rounded-lg text-bb-green opacity-50 transition-all hover:bg-gray-200 hover:opacity-100 active:scale-90 active:opacity-50"
