@@ -19,8 +19,6 @@ interface BBItemSearchProps {
   onSelectItemAction: (searchedItem: ShopItem|undefined) => void;
   onExploreAction?: () => void;
   onSelectShopAction?: (searchedShop: Shop|undefined) => void;
-  onShopClear?: ()=>void;
-  onItemClear?: ()=>void;
   buttonMode?: boolean;
 }
 
@@ -28,8 +26,6 @@ function BBItemSearch({
   onSelectItemAction,
   onExploreAction,
   onSelectShopAction,
-  onShopClear,
-  onItemClear,
   buttonMode = true,
 }: BBItemSearchProps) {
 //TODO: MAYBE JUST REMOVE THE SEARCH BUTTONS AND AUTO DISPLAY DETAILS ON SELECT. This actually introduces unnecessary code cohession so it needs to be refactored later on to remove that. maybe pass a "mode"/"currentpage" instead

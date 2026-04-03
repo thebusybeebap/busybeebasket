@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import BouncyButton from "../components/ui/BouncyButton";
 import BBItemSearch from "../features/BBItemSearch";
-import { Shop, Item, ShopItem } from "../data/models";
+import { Shop, ShopItem } from "../data/models";
 import { Ban, Save, SquarePen, SquareX, Trash2 } from "lucide-react";
 import useShopItem from "../hooks/useShopItem";
 import useShop from "../hooks/useShop";
