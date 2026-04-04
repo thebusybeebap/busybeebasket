@@ -6,7 +6,6 @@ import { BASKET_ITEM_STATUS } from "../services/bbddb";
 import useBasketItem from "../hooks/useBasketItem";
 import {
   ArchiveX,
-  Settings2,
   ShoppingBasket,
   ShoppingCart,
   //Trash,
@@ -46,6 +45,17 @@ function BBBasket() {
   let baggedItemsTotalPrice = liveBasket.reduce((total, item) => item.status === BASKET_ITEM_STATUS.BAGGED ? total + (item.price ?? 0) : total, 0);
 
   let [isPicking, setIsPicking] = useState(true);
+
+  let shopsInList = [...new Map(liveBasket
+    .filter((item)=>item.status !== BASKET_ITEM_STATUS.BAGGED)
+    .map(item => [item.shopId, {id: item.shopId, name: item.shopName}])).values()];
+
+  let [shopFilter, setShopFilter] = useState<string[]>([]);
+
+  let shopFilteredLiveBasket = liveBasket.filter((item) => !shopFilter.includes(item.shopId));
+
+  let unpickedFilteredCount = shopFilteredLiveBasket.reduce((count, item) => 
+    item.status === BASKET_ITEM_STATUS.UNPICKED ? count + 1 : count, 0);
 
   function handleAddItem(itemToAdd: ShopItem|Item|undefined) {
     addItemToBasket(itemToAdd as BasketItem);
@@ -98,19 +108,27 @@ function BBBasket() {
     setIsPicking((isPicking) => !isPicking);
   }
 
-  function handleListOptions(){
-    //No need to navigate
-    return;
-  }
-
   function openRecordManagement(){
     navigate('/repo');
   }
 
-  //TODO:DONE Suggestion Details, BugFix and UI
-  //TODO:DONE Edit Price function
-  //TODO: Shop Record Management(Edit Name, Delete Shop, etc)
-  //TODO: Item Record Management(Edit Name, Delete Item/ShopItem, etc)
+  function handleFilterShop(shopId: string){
+    if(shopFilter.includes(shopId)){
+      setShopFilter((shopIds)=>shopIds.filter((shopIds) => shopIds !== shopId));   
+    }
+    else{
+      setShopFilter((shopIds)=>[...shopIds, shopId]);
+    }
+  }
+
+  function handleFilterAllShops(){
+    if(shopFilter.length === 0){
+      setShopFilter(shopsInList.map((shop) => shop.id));
+    }
+    else{
+      setShopFilter([]);
+    }
+  }
 
   return(
     <div className="h-full grid grid-rows-[auto_1fr_auto_auto]">
@@ -130,7 +148,7 @@ function BBBasket() {
         ) : (
           isPicking ? 
             <BBList
-              liveBasket={liveBasket}
+              liveBasket={shopFilteredLiveBasket}
               removeItem={handleRemoveItem}
               checkItem={handleItemCheck}
               reOrderItems={handleItemReorder}
@@ -145,7 +163,7 @@ function BBBasket() {
             <div className="flex-1">
               <span className="font-medium text-bb-prim p-1">
                 {isPicking ? 
-                  unpickedCount + " item(s) left" :
+                  unpickedFilteredCount + " item(s) left" :
                   basketCount + " Items"
                 }
               </span>
@@ -157,11 +175,35 @@ function BBBasket() {
                 </span>}
             </div>
           </div>
+          {!isPicking ? null :
+            <div className="bg-bb-prim-l px-2 py-1 text-xs flex flex-row-reverse md:flex-row flex-wrap gap-1">
+              <span 
+                className={"cursor-pointer border-1 p-1 " +
+                (shopFilter.length === 0 ? "border-bb-sec text-bb-sec bg-bb-off" :
+                "border-bb-off text-bb-off")}
+                onClick={handleFilterAllShops}
+              >
+                All
+              </span>
+              {shopsInList.map((shop)=>(
+                <span 
+                  key={shop?.id}
+                  className={"cursor-pointer border-1 p-1 " + 
+                    (shopFilter.includes(shop?.id ?? "") ? 
+                    "border-bb-off text-bb-off" :
+                    "border-bb-sec text-bb-sec bg-bb-off")}
+                  onClick={()=>handleFilterShop(shop.id)}
+                >
+                  {shop?.name}
+                </span>  
+              ))}
+            </div>
+          }
         </div> : 
         null
       }
 
-      <div className="bg-bb-prim flex flex-row gap-1 p-2">
+      <div className="bg-bb-prim p-2">
           <div className="flex-1 grid grid-flow-col auto-cols-fr justify-center gap-1">
               {isPicking ? <>
                 <BouncyButton
@@ -203,7 +245,7 @@ function BBBasket() {
                   onClick={handlePickMore}
                   type="texticon"
                   size="sm"
-                  //key="pick-more-btn" //prevents the action leak on rerender issue, commented for accisdental animated side-effect
+                  //key="pick-more-btn" //prevents the action leak on rerender issue, commented for accidental animated side-effect
                 >
                   <ShoppingBasket className="flex-shrink-0 text-bb-green" />
                   <span className="text-xs font-medium text-bb-prim">
@@ -212,27 +254,9 @@ function BBBasket() {
                 </BouncyButton>
               </>}
           </div>
-          <div className="ml-auto">
-            <BouncyButton onClick={handleListOptions} size="ty" type="icononly">
-              <Settings2 className="flex-shrink-0 text-gray-700" size={25} strokeWidth={1.5}/>
-            </BouncyButton>
-          </div>
       </div>
 
     </div>
   );
 }
 export default BBBasket;
-
-/*
-<BouncyButton
-  onClick={handleRemoveUnpicked}
-  type="texticon"
-  size="sm"
->
-  <Trash className="flex-shrink-0 text-bb-red" />
-  <span className="text-xs font-medium text-bb-prim">
-    Remove Unpicked
-  </span>
-</BouncyButton>
-*/

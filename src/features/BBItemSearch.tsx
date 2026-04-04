@@ -14,7 +14,6 @@ import BouncyButton from "../components/ui/BouncyButton.js";
 import { useLocation } from "wouter";
 
 //TODO: suggestions search overflow scroll list not entire page
-//TODO: !!BUGFIX, shopname showing when there is a selected shop, and not showing if there is no selected shop
 
 interface BBItemSearchProps {
   onSelectItemAction: (searchedItem: ShopItem|undefined) => void;
@@ -29,11 +28,6 @@ function BBItemSearch({
   onSelectShopAction,
   buttonMode = true,
 }: BBItemSearchProps) {
-//TODO: MAYBE JUST REMOVE THE SEARCH BUTTONS AND AUTO DISPLAY DETAILS ON SELECT. This actually introduces unnecessary code cohession so it needs to be refactored later on to remove that. maybe pass a "mode"/"currentpage" instead
-//isButtonMode
-//in handleShopSelect at end if inRepo auto-call onSelectShopAction
-//in handleItemSelect AND handleCreateNewItem at end if inRepo auto-call onSelectItemAction
-
 
   let [selectedShop, setSelectedShop] = useState<Shop>();
   let { fetchShopsByNameQuery, createShop } = useShop();
@@ -47,7 +41,7 @@ function BBItemSearch({
   } = useShopItem();
   const [location, navigate] = useLocation();
 
-  let notHome = location != "/"; //TODO: inRepo instead??
+  let notHome = location != "/"; //TODO: inRepo instead?
 
   /*function handleClearSearch(){
     setSelectedShop(undefined);
